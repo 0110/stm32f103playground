@@ -7,6 +7,9 @@
 
 ## Used Pins
 
+Status LED to show board activity:
+* PB0 - LED blinks in 500ms cycle when waiting; in 250ms cycle when USB is connected
+
 Used for the Display:
 * PA4 - NSS
 * PA5 - SCK

@@ -221,6 +221,7 @@ int __attribute__((noreturn)) main(void) {
   /*
    * Creates the blinker thread.
    */
+  palSetPadMode(GPIOB, GPIOB_LED, PAL_MODE_OUTPUT_PUSHPULL);
   chThdCreateStatic(waThread1, sizeof(waThread1), NORMALPRIO, Thread1, NULL);
 
   ssd1803a_spi_init();

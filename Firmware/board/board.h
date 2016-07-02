@@ -47,7 +47,6 @@
 
 /* on-board */
 
-#define GPIOB_LED               1
 #define GPIOB_USB_DISC          9
 #define GPIOD_OSC_IN            0
 #define GPIOD_OSC_OUT           1
@@ -69,7 +68,7 @@
 #define GPIOA_SPI1_SCK          5       // pin 13
 #define GPIOA_SPI1_MISO         6       // pin 14
 #define GPIOA_SPI1_MOSI         7       // pin 15
-#define GPIOB_ADC12_IN8         0       // pin 16
+#define GPIOB_LED               0       // pin 16
 #define GPIOB_BOOT1             2       // pin 17
 #define GPIOB_I2C2_SCL          10      // pin 18
 #define GPIOB_I2C2_SDA          11      // pin 19
