@@ -24,6 +24,7 @@
 #include "chprintf.h"
 
 #include "usbcfg.h"
+#include "lcd/ssd1803a-spi.h"
 
 /* Virtual serial port over USB.*/
 SerialUSBDriver SDU1;
@@ -67,6 +68,52 @@ static void cmd_threads(BaseSequentialStream *chp, int argc, char *argv[]) {
             states[tp->p_state]);
     tp = chRegNextThread(tp);
   } while (tp != NULL);
+}
+
+void cmd_lcd(BaseSequentialStream *chp, int argc, char *argv[])
+{
+  int index, strLength;
+  int i=0;
+  if (argc < 1)
+  {
+    chprintf(chp, "Usage <input>\r\n");
+    return;
+  }
+
+  strLength = 0;
+  /* Count length of all parameter */
+  for(index=0; index < argc; index++)
+  {
+	  strLength += strlen(argv[index]) + 1 /* for the space between*/;
+  }
+
+  strLength --;
+
+  for(i=0;i<strLength;i++)
+  {
+	  /* Kaepten mag die Loop nicht */
+	  if (argv[0][i] == '\0')
+	  {
+		  argv[0][i] = ' ';
+	  } /* But it is necessary! */
+  }
+
+  /* Debug output */
+ for(i=0; i < strLength; i++)
+ {
+   chprintf(chp, "%2X (%c)\r\n", (int) argv[0][i], argv[0][i]);
+ }
+
+
+  if (ssd1803a_spi_sendText(argv[0], strLength) != SSD1803A_RET_OK)
+  {
+      chprintf(chp, "Could not update LCD\r\n");
+  }
+  else
+  {
+    chprintf(chp, "Wrote %d characters on the screen\r\n", strLength);
+  }
+
 }
 
 static void cmd_write(BaseSequentialStream *chp, int argc, char *argv[]) {
@@ -174,6 +221,9 @@ int __attribute__((noreturn)) main(void) {
    * Creates the blinker thread.
    */
   chThdCreateStatic(waThread1, sizeof(waThread1), NORMALPRIO, Thread1, NULL);
+
+  ssd1803a_spi_init();
+
 
   /*
    * Normal main() thread activity, in this demo it does nothing except
