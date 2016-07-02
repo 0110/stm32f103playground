@@ -27,7 +27,7 @@ static void spicb(SPIDriver *spip);
 static const SPIConfig spicfg = {
   spicb,
   /* HW dependent part.*/
-  GPIOB,
+  GPIOA,
   12,
   SPI_CR1_BR_2
 };
@@ -50,26 +50,23 @@ spi_implement_ret_t spi_implement_init(void)
 
   /*
    * Initializes the SPI driver 2. The SPI2 signals are routed as follow:
-   * PB12 - NSS.
-   * PB13 - SCK.
-   * PB14 - MISO.
-   * PB15 - MOSI.
+   * PA4 - NSS.
+   * PA5 - SCK.
+   * PA6 - MISO.
+   * PA7 - MOSI.
    */
-  spiStart(&SPID2, &spicfg);
-  palSetPad(GPIOB, 12);
-  palSetPadMode(GPIOB, 12, PAL_MODE_OUTPUT_PUSHPULL |
-                           PAL_STM32_OSPEED_HIGHEST);           /* NSS.     */
-  palSetPadMode(GPIOB, 13, PAL_MODE_ALTERNATE(5) |
-                           PAL_STM32_OSPEED_HIGHEST);           /* SCK.     */
-  palSetPadMode(GPIOB, 14, PAL_MODE_ALTERNATE(5));              /* MISO.    */
-  palSetPadMode(GPIOB, 15, PAL_MODE_ALTERNATE(5) |
-                           PAL_STM32_OSPEED_HIGHEST);           /* MOSI.    */
+  spiStart(&SPID1, &spicfg);
+  palSetPad(GPIOA, 4);
+  palSetPadMode(GPIOA, 4, PAL_MODE_OUTPUT_PUSHPULL);        /* NSS.     */
+  palSetPadMode(GPIOA, 5, PAL_MODE_OUTPUT_OPENDRAIN);           /* SCK.     */
+  palSetPadMode(GPIOA, 6, PAL_MODE_INPUT);           /* MISO.    */
+  palSetPadMode(GPIOA, 7, PAL_MODE_OUTPUT_OPENDRAIN);           /* MOSI.    */
 
    return SPI_IMPL_RET_OK;
 }
 
 spi_implement_ret_t     spi_implement_send(int n, const void *txbuf)
 {
-  spiStartSendI(&SPID2, n, txbuf);
+  spiStartSendI(&SPID1, n, txbuf);
   return SPI_IMPL_RET_OK;
 }
