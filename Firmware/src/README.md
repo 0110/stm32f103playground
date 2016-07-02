@@ -7,4 +7,8 @@
 
 ## Used Pins
 
-
+Used for the Display:
+* PA4 - NSS
+* PA5 - SCK
+* PA6 - MISO
+* PA7 - MOSI
