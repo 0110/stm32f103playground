@@ -26,8 +26,8 @@
 #include "usbcfg.h"
 #include "lcd/ssd1803a-spi.h"
 
-
-#define PRINT( ... ) chprintf((BaseSequentialStream *) &SD1, __VA_ARGS__);/**< Uart print */
+#define PRINT_SD	SD2
+#define PRINT( ... ) chprintf((BaseSequentialStream *) &PRINT_SD, __VA_ARGS__);/**< Uart print */
 
 /* Virtual serial port over USB.*/
 SerialUSBDriver SDU1;
@@ -215,6 +215,12 @@ int __attribute__((noreturn)) main(void) {
   chThdSleepMilliseconds(1500);
   usbStart(serusbcfg.usbp, &usbcfg);
   usbConnectBus(serusbcfg.usbp);
+
+  /*
+   * Activates the serial driver 6 and SDC driver 1 using default
+   * configuration.
+   */
+  sdStart(&PRINT_SD, NULL);
 
   /*
    * Shell manager initialization.

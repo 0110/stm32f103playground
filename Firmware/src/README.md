@@ -15,3 +15,7 @@ Used for the Display:
 * PA5 - SCK
 * PA6 - MISO
 * PA7 - MOSI
+
+Used for a serial connection
+* PA2 - TX of UART
+* PA3 - RX of UART
