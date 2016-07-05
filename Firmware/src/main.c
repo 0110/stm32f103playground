@@ -26,6 +26,9 @@
 #include "usbcfg.h"
 #include "lcd/ssd1803a-spi.h"
 
+
+#define PRINT( ... ) chprintf((BaseSequentialStream *) &SD2, __VA_ARGS__);/**< Uart print */
+
 /* Virtual serial port over USB.*/
 SerialUSBDriver SDU1;
 
@@ -226,6 +229,7 @@ int __attribute__((noreturn)) main(void) {
 
   ssd1803a_spi_init();
 
+  PRINT("\x1b[1J\x1b[0;0HStarting ChibiOS\r\n");
 
   /*
    * Normal main() thread activity, in this demo it does nothing except
