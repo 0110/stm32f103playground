@@ -27,7 +27,7 @@
 #include "lcd/ssd1803a-spi.h"
 
 
-#define PRINT( ... ) chprintf((BaseSequentialStream *) &SD2, __VA_ARGS__);/**< Uart print */
+#define PRINT( ... ) chprintf((BaseSequentialStream *) &SD1, __VA_ARGS__);/**< Uart print */
 
 /* Virtual serial port over USB.*/
 SerialUSBDriver SDU1;
