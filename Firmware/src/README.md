@@ -10,12 +10,6 @@
 Status LED to show board activity:
 * PB0 - LED blinks in 500ms cycle when waiting; in 250ms cycle when USB is connected
 
-Used for the Display:
-* PA4 - NSS
-* PA5 - SCK
-* PA6 - MISO
-* PA7 - MOSI
-
 Used for a serial connection
 * PA2 - TX of UART
 * PA3 - RX of UART
