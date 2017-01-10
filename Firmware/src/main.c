@@ -24,7 +24,6 @@
 #include "chprintf.h"
 
 #include "usbcfg.h"
-#include "lcd/ssd1803a-spi.h"
 
 #define PRINT_SD	SD2
 #define PRINT( ... ) chprintf((BaseSequentialStream *) &PRINT_SD, __VA_ARGS__);/**< Uart print */
@@ -73,52 +72,6 @@ static void cmd_threads(BaseSequentialStream *chp, int argc, char *argv[]) {
   } while (tp != NULL);
 }
 
-void cmd_lcd(BaseSequentialStream *chp, int argc, char *argv[])
-{
-  int index, strLength;
-  int i=0;
-  if (argc < 1)
-  {
-    chprintf(chp, "Usage <input>\r\n");
-    return;
-  }
-
-  strLength = 0;
-  /* Count length of all parameter */
-  for(index=0; index < argc; index++)
-  {
-	  strLength += strlen(argv[index]) + 1 /* for the space between*/;
-  }
-
-  strLength --;
-
-  for(i=0;i<strLength;i++)
-  {
-	  /* Kaepten mag die Loop nicht */
-	  if (argv[0][i] == '\0')
-	  {
-		  argv[0][i] = ' ';
-	  } /* But it is necessary! */
-  }
-
-  /* Debug output */
- for(i=0; i < strLength; i++)
- {
-   chprintf(chp, "%2X (%c)\r\n", (int) argv[0][i], argv[0][i]);
- }
-
-
-  if (ssd1803a_spi_sendText(argv[0], strLength) != SSD1803A_RET_OK)
-  {
-      chprintf(chp, "Could not update LCD\r\n");
-  }
-  else
-  {
-    chprintf(chp, "Wrote %d characters on the screen\r\n", strLength);
-  }
-
-}
-
 static void cmd_write(BaseSequentialStream *chp, int argc, char *argv[]) {
   static uint8_t buf[] =
       "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
@@ -154,7 +107,6 @@ static const ShellCommand commands[] = {
   {"mem", cmd_mem},
   {"threads", cmd_threads},
   {"write", cmd_write},
-  {"lcd", cmd_lcd},
   {NULL, NULL}
 };
 
@@ -232,8 +184,6 @@ int __attribute__((noreturn)) main(void) {
    */
   palSetPadMode(GPIOB, GPIOB_LED, PAL_MODE_OUTPUT_PUSHPULL);
   chThdCreateStatic(waThread1, sizeof(waThread1), NORMALPRIO, Thread1, NULL);
-
-  ssd1803a_spi_init();
 
   PRINT("\x1b[1J\x1b[0;0HStarting ChibiOS\r\n");
 
