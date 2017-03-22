@@ -3,3 +3,5 @@
 .hex
 Firmware/build
 .dep
+update.sh
+*.hex
