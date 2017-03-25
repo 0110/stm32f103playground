@@ -33,4 +33,4 @@ Example usage:
 # Software
 ## Chibios
 ## Modules
-* DS18B20 [Github source](https://github.com/part1zano/chibios-stm32f103/tree/master/ds18b20_new)
+* SDCardOverSPI [Github source](https://github.com/ChibiOS/ChibiOS/tree/master/demos/STM32/RT-STM32F103-OLIMEX_STM32_P103-FATFS)
