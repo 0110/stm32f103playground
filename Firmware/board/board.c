@@ -42,6 +42,29 @@ void __early_init(void) {
   stm32_clock_init();
 }
 
+#if HAL_USE_MMC_SPI || defined(__DOXYGEN__)
+/**
+ * @brief   MMC_SPI card detection.
+ */
+bool mmc_lld_is_card_inserted(MMCDriver *mmcp) {
+
+  (void)mmcp;
+  /* TODO: Fill the implementation.*/
+  return TRUE;
+}
+
+/**
+ * @brief   MMC_SPI card write protection detection.
+ */
+bool mmc_lld_is_write_protected(MMCDriver *mmcp) {
+
+  (void)mmcp;
+  /* TODO: Fill the implementation.*/
+  return FALSE;
+}
+#endif
+
+
 /*
  * Board-specific initialization code.
  */

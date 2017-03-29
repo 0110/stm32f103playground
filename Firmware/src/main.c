@@ -113,15 +113,15 @@ static FATFS SDC_FS;
 static bool fs_ready = FALSE;
 
 /* Maximum speed SPI configuration (18MHz, CPHA=0, CPOL=0, MSb first).*/
-static SPIConfig hs_spicfg = {NULL, IOPORT2, GPIOB_SPI2NSS, 0, 0};
+static SPIConfig hs_spicfg = {NULL, IOPORT2, GPIOB_SPI2_NSS, 0 };
 
 /* Low speed SPI configuration (281.250kHz, CPHA=0, CPOL=0, MSb first).*/
-static SPIConfig ls_spicfg = {NULL, IOPORT2, GPIOB_SPI2NSS,
-                              SPI_CR1_BR_2 | SPI_CR1_BR_1,
-                              0};
+static SPIConfig ls_spicfg = {NULL, IOPORT2, GPIOB_SPI2_NSS,
+                              SPI_CR1_BR_2 | SPI_CR1_BR_1};
 
 /* MMC/SD over SPI driver configuration.*/
-static MMCConfig mmccfg = {&SPID2, &ls_spicfg, &hs_spicfg};
+static MMCConfig mmccfg = { &SPID2, &ls_spicfg, &hs_spicfg};
+/*FIXME Es gibt scheinbar nur nen SPID1 in der spi_lld.c keine Ahnung wo der 2. definiert wird */
 
 /* Generic large buffer.*/
 static uint8_t fbuff[1024];
@@ -274,6 +274,9 @@ static const ShellConfig shell_cfg1 = {
 /* Main and Generic code.                                                    */
 /*===========================================================================*/
 
+static thread_t *shelltp = NULL;
+MMCDriver MMCD1;
+
 /*
  * Blinker thread, times are in milliseconds.
  */
@@ -327,13 +330,11 @@ static void RemoveHandler(eventid_t id) {
  * Application entry point.
  */
 int __attribute__((noreturn)) main(void) {
-  thread_t *shelltp = NULL;
   static const evhandler_t evhndl[] = {
     InsertHandler,
-    RemoveHandler,
-    ShellHandler
+    RemoveHandler
   };
-  event_listener_t el0, el1, el2;
+  event_listener_t el0, el1;
 
   /*
    * System initializations.
@@ -369,8 +370,8 @@ int __attribute__((noreturn)) main(void) {
   /*
    * Initializes the MMC driver to work with SPI2.
    */
-  palSetPadMode(IOPORT2, GPIOB_SPI2NSS, PAL_MODE_OUTPUT_PUSHPULL);
-  palSetPad(IOPORT2, GPIOB_SPI2NSS);
+  palSetPadMode(IOPORT2, GPIOB_SPI2_NSS, PAL_MODE_OUTPUT_PUSHPULL);
+  palSetPad(IOPORT2, GPIOB_SPI2_NSS);
   mmcObjectInit(&MMCD1);
   mmcStart(&MMCD1, &mmccfg);
 
@@ -398,5 +399,6 @@ int __attribute__((noreturn)) main(void) {
       shelltp = NULL;           /* Triggers spawning of a new shell.        */
     }
     chThdSleepMilliseconds(1000);
+    chEvtDispatch(evhndl, chEvtWaitOneTimeout(ALL_EVENTS, MS2ST(500)));
   }
 }
