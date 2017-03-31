@@ -23,12 +23,11 @@
 #include "shell.h"
 #include "chprintf.h"
 
-#include "usbcfg.h"
-
 #include "ff.h"
 
-/* Virtual serial port over USB.*/
-SerialUSBDriver SDU1;
+/* Serial connection */
+#define PRINT_UART1     SD1
+#define PRINT( ... ) chprintf((BaseSequentialStream *) &PRINT_UART1, __VA_ARGS__);/**< Uart print */
 
 
 /*===========================================================================*/
@@ -226,47 +225,15 @@ static void cmd_threads(BaseSequentialStream *chp, int argc, char *argv[]) {
   } while (tp != NULL);
 }
 
-static void cmd_write(BaseSequentialStream *chp, int argc, char *argv[]) {
-  static uint8_t buf[] =
-      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
-      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
-      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
-      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
-      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
-      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
-      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
-      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
-      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
-      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
-      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
-      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
-      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
-      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
-      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
-      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
-
-  (void)argv;
-  if (argc > 0) {
-    chprintf(chp, "Usage: write\r\n");
-    return;
-  }
-
-  while (chnGetTimeout((BaseChannel *)chp, TIME_IMMEDIATE) == Q_TIMEOUT) {
-    chSequentialStreamWrite(&SDU1, buf, sizeof buf - 1);
-  }
-  chprintf(chp, "\r\n\nstopped\r\n");
-}
-
 static const ShellCommand commands[] = {
   {"mem", cmd_mem},
   {"threads", cmd_threads},
-  {"write", cmd_write},
   {"tree", cmd_tree},
   {NULL, NULL}
 };
 
 static const ShellConfig shell_cfg1 = {
-  (BaseSequentialStream *)&SDU1,
+  (BaseSequentialStream *)&PRINT_UART1,
   commands
 };
 
@@ -274,7 +241,6 @@ static const ShellConfig shell_cfg1 = {
 /* Main and Generic code.                                                    */
 /*===========================================================================*/
 
-static thread_t *shelltp = NULL;
 MMCDriver MMCD1;
 
 /*
@@ -286,7 +252,7 @@ static __attribute__((noreturn)) THD_FUNCTION(Thread1, arg) {
   (void)arg;
   chRegSetThreadName("blinker");
   while (true) {
-    systime_t time = serusbcfg.usbp->state == USB_ACTIVE ? 250 : 500;
+    systime_t time = 250;
     palClearPad(GPIOB, GPIOB_LED);
     chThdSleepMilliseconds(time);
     palSetPad(GPIOB, GPIOB_LED);
@@ -347,22 +313,6 @@ int __attribute__((noreturn)) main(void) {
   chSysInit();
 
   /*
-   * Initializes a serial-over-USB CDC driver.
-   */
-  sduObjectInit(&SDU1);
-  sduStart(&SDU1, &serusbcfg);
-
-  /*
-   * Activates the USB driver and then the USB bus pull-up on D+.
-   * Note, a delay is inserted in order to not have to disconnect the cable
-   * after a reset.
-   */
-  usbDisconnectBus(serusbcfg.usbp);
-  chThdSleepMilliseconds(1500);
-  usbStart(serusbcfg.usbp, &usbcfg);
-  usbConnectBus(serusbcfg.usbp);
-
-  /*
    * Shell manager initialization.
    */
   shellInit();
@@ -392,12 +342,6 @@ int __attribute__((noreturn)) main(void) {
   chEvtRegister(&inserted_event, &el0, 0);
   chEvtRegister(&removed_event, &el1, 1);
   while (true) {
-    if (!shelltp && (SDU1.config->usbp->state == USB_ACTIVE))
-      shelltp = shellCreate(&shell_cfg1, SHELL_WA_SIZE, NORMALPRIO);
-    else if (chThdTerminatedX(shelltp)) {
-      chThdRelease(shelltp);    /* Recovers memory of the previous shell.   */
-      shelltp = NULL;           /* Triggers spawning of a new shell.        */
-    }
     chThdSleepMilliseconds(1000);
     chEvtDispatch(evhndl, chEvtWaitOneTimeout(ALL_EVENTS, MS2ST(500)));
   }

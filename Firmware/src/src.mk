@@ -1,6 +1,5 @@
 # List of all the board related files.
-APPSRC = src/main.c \
-         src/usbcfg.c
+APPSRC = src/main.c
 
 # Required include directories
 APPINC = ${APP} 

@@ -14,18 +14,20 @@ Used for a serial connection
 * PA2 - TX of UART
 * PA3 - RX of UART
 
-Serial Bootloader needs
+Used for a serial connection and the serial Bootloader:
 * PA9 - TX of UART
 * PA10 - RX of UART
+
+## Flashing Software
+### Serial Flashing needs
+* [stm32flash](https://sourceforge.net/p/stm32flash/code/ci/master/tree/)
+
 And during the reset
 * BOOT0 enabled
 * BOOT1 disabled
 Normal startup is with BOOT0 and BOOT1 disabled
 [Source](https://www.youtube.com/watch?v=G_RF0a0hrak)
 
-## Flashing Software
-### Serial Flashing needs
-* [stm32flash](https://sourceforge.net/p/stm32flash/code/ci/master/tree/)
 
 Example usage:
 ./stm32flash -v -w ch.hex /dev/ttyUSB0
