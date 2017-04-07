@@ -267,6 +267,7 @@ static void InsertHandler(eventid_t id) {
   FRESULT err;
 
   (void)id;
+  PRINT("SD Card inserted\r\n");
   /*
    * On insertion SDC initialization and FS mount.
    */
@@ -279,6 +280,7 @@ static void InsertHandler(eventid_t id) {
     return;
   }
   fs_ready = TRUE;
+  PRINT("SD Card ready\r\n");
 }
 
 /*
