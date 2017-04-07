@@ -120,7 +120,6 @@ static SPIConfig ls_spicfg = {NULL, IOPORT2, GPIOB_SPI2_NSS,
 
 /* MMC/SD over SPI driver configuration.*/
 static MMCConfig mmccfg = { &SPID2, &ls_spicfg, &hs_spicfg};
-/*FIXME Es gibt scheinbar nur nen SPID1 in der spi_lld.c keine Ahnung wo der 2. definiert wird */
 
 /* Generic large buffer.*/
 static uint8_t fbuff[1024];
@@ -267,7 +266,7 @@ static void InsertHandler(eventid_t id) {
   FRESULT err;
 
   (void)id;
-  PRINT("SD Card inserted\r\n");
+  PRINT("[SD Card] inserted\r\n");
   /*
    * On insertion SDC initialization and FS mount.
    */
@@ -280,7 +279,7 @@ static void InsertHandler(eventid_t id) {
     return;
   }
   fs_ready = TRUE;
-  PRINT("SD Card ready\r\n");
+  PRINT("[SD Card] ready\r\n");
 }
 
 /*
@@ -291,6 +290,7 @@ static void RemoveHandler(eventid_t id) {
   (void)id;
   mmcDisconnect(&MMCD1);
   fs_ready = FALSE;
+  PRINT("[SD Card] removed\r\n");
 }
 
 
