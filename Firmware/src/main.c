@@ -310,7 +310,11 @@ int __attribute__((noreturn)) main(void) {
    *   RTOS is active.
    */
   halInit();
+  sdStart(&PRINT_UART1, NULL);
   chSysInit();
+
+  PRINT("\x1b[1J\x1b[0;0HStarting ChibiOS\r\n");
+  shellCreate(&shell_cfg1, SHELL_WA_SIZE, NORMALPRIO);
 
   /*
    * Shell manager initialization.
