@@ -10,10 +10,6 @@
 Status LED to show board activity:
 * PB0 - LED blinks in 500ms cycle when waiting; in 250ms cycle when USB is connected
 
-Used for a serial connection
-* PA2 - TX of UART
-* PA3 - RX of UART
-
 Used for a serial connection and the serial Bootloader:
 * PA9 - TX of UART
 * PA10 - RX of UART
