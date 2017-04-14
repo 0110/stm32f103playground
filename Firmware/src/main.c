@@ -29,7 +29,6 @@
 #define PRINT_UART1     SD1
 #define PRINT( ... ) chprintf((BaseSequentialStream *) &PRINT_UART1, __VA_ARGS__);/**< Uart print */
 
-
 /*===========================================================================*/
 /* Card insertion monitor.                                                   */
 /*===========================================================================*/
@@ -266,7 +265,7 @@ static void InsertHandler(eventid_t id) {
   FRESULT err;
 
   (void)id;
-  PRINT("[SD Card] inserted\r\n");
+  PRINT("[SD Card] inserted (state=%x)\r\n", gSDCardState);
   /*
    * On insertion SDC initialization and FS mount.
    */

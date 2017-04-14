@@ -16,6 +16,10 @@
 
 #include "hal.h"
 
+#include "board.h"
+
+extern uint8_t gSDCardState = SDCARD_STATE_UNKNOWN;
+
 /**
  * @brief   PAL setup.
  * @details Digital I/O ports static configuration as defined in @p board.h.
@@ -50,6 +54,8 @@ bool mmc_lld_is_card_inserted(MMCDriver *mmcp) {
 
   (void)mmcp;
   /* TODO: Fill the implementation.*/
+  gSDCardState |= SDCARD_STATE_INSERTED; /* Only some debug code for testing */
+
   return TRUE;
 }
 
@@ -60,6 +66,7 @@ bool mmc_lld_is_write_protected(MMCDriver *mmcp) {
 
   (void)mmcp;
   /* TODO: Fill the implementation.*/
+  gSDCardState |= SDCARD_STATE_READONLY; /* Only some debug code for testing */
   return FALSE;
 }
 #endif

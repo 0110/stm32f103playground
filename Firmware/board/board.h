@@ -180,10 +180,19 @@
  */
 #define usb_lld_disconnect_bus(usbp) palSetPad(GPIOB, GPIOB_USB_DISC)
 
+/* The SDCard states */
+#define SDCARD_STATE_UNKNOWN	0x00
+#define SDCARD_STATE_INSERTED 	0x01
+#define SDCARD_STATE_READONLY 	0x02
+
 #if !defined(_FROM_ASM_)
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+  /* Interface for the Board */
+  extern uint8_t gSDCardState;
+
   void boardInit(void);
 #ifdef __cplusplus
 }
