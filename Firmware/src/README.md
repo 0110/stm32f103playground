@@ -14,6 +14,12 @@ Used for a serial connection and the serial Bootloader:
 * PA9 - TX of UART
 * PA10 - RX of UART
 
+Used for the SDCard connected via SPI
+* PB12 - NSS
+* PB13 - SCK
+* PB14 - MISO
+* PB15 - MOSI
+
 ## Flashing Software
 ### Serial Flashing needs
 * [stm32flash](https://sourceforge.net/p/stm32flash/code/ci/master/tree/)
@@ -32,3 +38,4 @@ Example usage:
 ## Chibios
 ## Modules
 * SDCardOverSPI [Github source](https://github.com/ChibiOS/ChibiOS/tree/master/demos/STM32/RT-STM32F103-OLIMEX_STM32_P103-FATFS)
+** Connection [Olimex STM32-P103 board](https://www.olimex.com/Products/ARM/ST/STM32-P405/resources/STM32-P103_P405_sch.pdf)
