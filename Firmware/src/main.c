@@ -269,8 +269,10 @@ static void InsertHandler(eventid_t id) {
   /*
    * On insertion SDC initialization and FS mount.
    */
-  if (mmcConnect(&MMCD1))
+  if (mmcConnect(&MMCD1)) {
     return;
+  }
+  PRINT("[SD Card] connected\r\n");
 
   err = f_mount(&SDC_FS, "/", 1);
   if (err != FR_OK) {
@@ -278,7 +280,7 @@ static void InsertHandler(eventid_t id) {
     return;
   }
   fs_ready = TRUE;
-  PRINT("[SD Card] ready\r\n");
+  PRINT("[SD Card] mounted and ready\r\n");
 }
 
 /*
@@ -311,11 +313,10 @@ int __attribute__((noreturn)) main(void) {
    *   RTOS is active.
    */
   halInit();
-  sdStart(&PRINT_UART1, NULL);
   chSysInit();
+  sdStart(&PRINT_UART1, NULL);
 
   PRINT("\x1b[1J\x1b[0;0HStarting ChibiOS\r\n");
-  shellCreate(&shell_cfg1, SHELL_WA_SIZE, NORMALPRIO);
 
   /*
    * Shell manager initialization.
@@ -346,8 +347,11 @@ int __attribute__((noreturn)) main(void) {
    */
   chEvtRegister(&inserted_event, &el0, 0);
   chEvtRegister(&removed_event, &el1, 1);
+
+  /* Create the serial shell */
+  shellCreate(&shell_cfg1, SHELL_WA_SIZE, NORMALPRIO);
+
   while (true) {
-    chThdSleepMilliseconds(1000);
     chEvtDispatch(evhndl, chEvtWaitOneTimeout(ALL_EVENTS, MS2ST(500)));
   }
 }
