@@ -5,13 +5,14 @@
 BIN=ch.hex
 
 OPENOCD=openocd
-PROG_CFG=/usr/local/share/openocd/scripts/interface/stlink-v2.cfg
-CHIP_CFG=/usr/local/share/openocd/scripts/target/stm32f1x.cfg
-
+OPENOCD_DIR=/usr/local/share/openocd
 if [ -f update.sh ]; then
  echo "Update $BIN via script"
- bash ./update.sh
+ source update.sh
 fi
+
+PROG_CFG=$OPENOCD_DIR/scripts/interface/stlink-v2.cfg
+CHIP_CFG=$OPENOCD_DIR/scripts/target/stm32f1x.cfg
 
 if [ ! -f $BIN ]; then
   echo "There is no $BIN available"
