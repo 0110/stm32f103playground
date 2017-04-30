@@ -1,5 +1,12 @@
 # stm32f103playground
 
+## Software
+
+STM32 Toolchain for Ubuntu needs the following packages:
+ sudo apt-get install gcc-arm-none-eabi binutils-arm-none-eabi \
+    libnewlib-arm-none-eabi make
+
+
 ## Development setup
 
 In order to flash the STM32F103 Development Kit, only the following cabels must be connected:
