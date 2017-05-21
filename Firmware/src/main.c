@@ -270,6 +270,7 @@ static void InsertHandler(eventid_t id) {
    * On insertion SDC initialization and FS mount.
    */
   if (mmcConnect(&MMCD1)) {
+	PRINT("[SD Card] failed to connect\r\n");
     return;
   }
   PRINT("[SD Card] connected\r\n");
@@ -326,10 +327,13 @@ int __attribute__((noreturn)) main(void) {
   /*
    * Initializes the MMC driver to work with SPI2.
    */
+  /* Set the Chip select by default to high */
   palSetPadMode(IOPORT2, GPIOB_SPI2_NSS, PAL_MODE_OUTPUT_PUSHPULL);
   palSetPad(IOPORT2, GPIOB_SPI2_NSS);
+
   mmcObjectInit(&MMCD1);
   mmcStart(&MMCD1, &mmccfg);
+  PRINT("[SD Card] MMC driver inited\r\n");
 
   /*
    * Activates the card insertion monitor.

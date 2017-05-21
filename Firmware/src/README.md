@@ -15,7 +15,7 @@ Used for a serial connection and the serial Bootloader:
 * PA10 - RX of UART
 
 Used for the SDCard connected via SPI
-* PB12 - NSS
+* PB12 - NSS / CS
 * PB13 - SCK
 * PB14 - MISO
 * PB15 - MOSI
