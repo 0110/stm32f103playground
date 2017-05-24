@@ -18,7 +18,7 @@
 
 #include "board.h"
 
-extern uint8_t gSDCardState = SDCARD_STATE_UNKNOWN;
+uint8_t gSDCardState = SDCARD_STATE_UNKNOWN;
 
 /**
  * @brief   PAL setup.

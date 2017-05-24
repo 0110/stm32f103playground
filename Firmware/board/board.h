@@ -139,9 +139,12 @@
  * Everything input with pull-up except:
  * PB1    - Push Pull output  (LED).
  * PB9    - Push Pull output  (USB switch).
+ * PB13   - Alternate output  (SCK SPI2)
+ * PB14   - Normal input      (MISO SPI2)
+ * PB15   - Alternate output  (MOSI SPI2)
  */
 #define VAL_GPIOBCRL            0x88888838      /*  PB7...PB0 */
-#define VAL_GPIOBCRH            0x88888838      /* PB15...PB8 */
+#define VAL_GPIOBCRH            0xB4B88838      /* PB15...PB8 */
 #define VAL_GPIOBODR            0xFFFFFFFF
 
 /*
