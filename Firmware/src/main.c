@@ -318,6 +318,7 @@ int __attribute__((noreturn)) main(void) {
   sdStart(&PRINT_UART1, NULL);
 
   PRINT("\x1b[1J\x1b[0;0HStarting ChibiOS\r\n");
+  PRINT("Built at " __DATE__ " and exactly " __TIME__ "\r\n");
 
   /*
    * Shell manager initialization.
