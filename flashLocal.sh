@@ -14,7 +14,6 @@ OPENOCD_DIR=/usr/share/openocd
 
 PROG_CFG=$OPENOCD_DIR/scripts/interface/stlink-v2.cfg
 CHIP_CFG=$OPENOCD_DIR/scripts/target/stm32f1x.cfg
-#CHIP_CFG=stm32f1x.cfg
 
 cp $BINSRC $BIN
 

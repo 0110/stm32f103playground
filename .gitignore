@@ -3,3 +3,10 @@
 .hex
 Firmware/build
 .dep
+.cproject
+.project
+.settings/
+*.launch
+update.sh
+Firmware/lib/ChibiOS/os/ext/fatfs-0.10b-patched.7z
+Firmware/lib/ChibiOS/os/ext/ff12b.zip
