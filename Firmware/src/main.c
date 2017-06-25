@@ -332,7 +332,6 @@ int __attribute__((noreturn)) main(void) {
   palSetPadMode(IOPORT2, GPIOB_SPI2_NSS, PAL_MODE_OUTPUT_PUSHPULL);
   palSetPad(IOPORT2, GPIOB_SPI2_NSS);
 
-  chThdSleepMilliseconds(MS2ST(50));
   mmcObjectInit(&MMCD1);
   mmcStart(&MMCD1, &mmccfg);
   PRINT("[SD Card] MMC driver inited\r\n");
