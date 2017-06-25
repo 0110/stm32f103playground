@@ -24,6 +24,7 @@
 #include "chprintf.h"
 
 #include "ff.h"
+#include "cmd/cmd.h"
 
 /* Serial connection */
 #define PRINT_UART1     SD1
@@ -227,6 +228,9 @@ static const ShellCommand commands[] = {
   {"mem", cmd_mem},
   {"threads", cmd_threads},
   {"tree", cmd_tree},
+#ifdef CMD_HAS_CAT
+  {"cat", cmd_cat},
+#endif
   {NULL, NULL}
 };
 
