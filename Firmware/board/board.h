@@ -145,7 +145,7 @@
  * PB15   - Alternate output  (MOSI SPI2)
  */
 #define VAL_GPIOBCRL            0x88888838      /*  PB7...PB0 */
-#define VAL_GPIOBCRH            0xB4B18838      /* PB15...PB8 */
+#define VAL_GPIOBCRH            0xB4BB8838      /* PB15...PB8 */
 #define VAL_GPIOBODR            0xFFFFFFFF
 
 /*

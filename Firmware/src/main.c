@@ -321,11 +321,6 @@ int __attribute__((noreturn)) main(void) {
   PRINT("Built at " __DATE__ " and exactly " __TIME__ "\r\n");
 
   /*
-   * Shell manager initialization.
-   */
-  shellInit();
-
-  /*
    * Initializes the MMC driver to work with SPI2.
    */
   /* Set the Chip select by default to high */
@@ -352,6 +347,11 @@ int __attribute__((noreturn)) main(void) {
    */
   chEvtRegister(&inserted_event, &el0, 0);
   chEvtRegister(&removed_event, &el1, 1);
+
+  /*
+   * Shell manager initialization.
+   */
+  shellInit();
 
   /* Create the serial shell */
   shellCreate(&shell_cfg1, SHELL_WA_SIZE, NORMALPRIO);
