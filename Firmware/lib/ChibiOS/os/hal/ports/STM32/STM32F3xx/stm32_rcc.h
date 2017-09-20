@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -171,7 +171,11 @@
  *
  * @api
  */
+#if defined(RCC_AHBENR_ADC12EN) || defined(__DOXYGEN__)
 #define rccEnableADC12(lp) rccEnableAHB(RCC_AHBENR_ADC12EN, lp)
+#else
+#define rccEnableADC12(lp) rccEnableAHB(RCC_AHBENR_ADC1EN, lp)
+#endif
 
 /**
  * @brief   Disables the ADC1/ADC2 peripheral clock.
@@ -180,14 +184,22 @@
  *
  * @api
  */
+#if defined(RCC_AHBENR_ADC12EN) || defined(__DOXYGEN__)
 #define rccDisableADC12(lp) rccDisableAHB(RCC_AHBENR_ADC12EN, lp)
+#else
+#define rccDisableADC12(lp) rccDisableAHB(RCC_AHBENR_ADC1EN, lp)
+#endif
 
 /**
  * @brief   Resets the ADC1/ADC2 peripheral.
  *
  * @api
  */
+#if defined(RCC_AHBRSTR_ADC12RST) || defined(__DOXYGEN__)
 #define rccResetADC12() rccResetAHB(RCC_AHBRSTR_ADC12RST)
+#else
+#define rccResetADC12() rccResetAHB(RCC_AHBRSTR_ADC1RST)
+#endif
 
 /**
  * @brief   Enables the ADC3/ADC4 peripheral clock.
@@ -196,7 +208,11 @@
  *
  * @api
  */
+#if defined(RCC_AHBENR_ADC34EN) || defined(__DOXYGEN__)
 #define rccEnableADC34(lp) rccEnableAHB(RCC_AHBENR_ADC34EN, lp)
+#else
+#define rccEnableADC34(lp) rccEnableAHB(RCC_AHBENR_ADC3EN, lp)
+#endif
 
 /**
  * @brief   Disables the ADC3/ADC4 peripheral clock.
@@ -205,14 +221,77 @@
  *
  * @api
  */
+#if defined(RCC_AHBENR_ADC34EN) || defined(__DOXYGEN__)
 #define rccDisableADC34(lp) rccDisableAHB(RCC_AHBENR_ADC34EN, lp)
+#else
+#define rccDisableADC34(lp) rccDisableAHB(RCC_AHBENR_ADC3EN, lp)
+#endif
 
 /**
  * @brief   Resets the ADC3/ADC4 peripheral.
  *
  * @api
  */
+#if defined(RCC_AHBRSTR_ADC34RST) || defined(__DOXYGEN__)
 #define rccResetADC34() rccResetAHB(RCC_AHBRSTR_ADC34RST)
+#else
+#define rccResetADC34() rccResetAHB(RCC_AHBRSTR_ADC3RST)
+#endif
+/** @} */
+
+/**
+ * @name    DAC peripheral specific RCC operations
+ * @{
+ */
+/**
+ * @brief   Enables the DAC1 peripheral clock.
+ *
+ * @param[in] lp        low power enable flag
+ *
+ * @api
+ */
+#define rccEnableDAC1(lp) rccEnableAPB1(RCC_APB1ENR_DAC1EN, lp)
+
+/**
+ * @brief   Disables the DAC1 peripheral clock.
+ *
+ * @param[in] lp        low power enable flag
+ *
+ * @api
+ */
+#define rccDisableDAC1(lp) rccDisableAPB1(RCC_APB1ENR_DAC1EN, lp)
+
+/**
+ * @brief   Resets the DAC1 peripheral.
+ *
+ * @api
+ */
+#define rccResetDAC1() rccResetAPB1(RCC_APB1RSTR_DAC1RST)
+
+/**
+ * @brief   Enables the DAC1 peripheral clock.
+ *
+ * @param[in] lp        low power enable flag
+ *
+ * @api
+ */
+#define rccEnableDAC2(lp) rccEnableAPB1(RCC_APB1ENR_DAC2EN, lp)
+
+/**
+ * @brief   Disables the DAC1 peripheral clock.
+ *
+ * @param[in] lp        low power enable flag
+ *
+ * @api
+ */
+#define rccDisableDAC2(lp) rccDisableAPB1(RCC_APB1ENR_DAC2EN, lp)
+
+/**
+ * @brief   Resets the DAC1 peripheral.
+ *
+ * @api
+ */
+#define rccResetDAC2() rccResetAPB1(RCC_APB1RSTR_DAC2RST)
 /** @} */
 
 /**
@@ -653,6 +732,106 @@
  * @api
  */
 #define rccResetTIM8() rccResetAPB2(RCC_APB2RSTR_TIM8RST)
+
+/**
+ * @brief   Enables the TIM15 peripheral clock.
+ *
+ * @param[in] lp        low power enable flag
+ *
+ * @api
+ */
+#define rccEnableTIM15(lp) rccEnableAPB2(RCC_APB2ENR_TIM15EN, lp)
+
+/**
+ * @brief   Disables the TIM15 peripheral clock.
+ *
+ * @param[in] lp        low power enable flag
+ *
+ * @api
+ */
+#define rccDisableTIM15(lp) rccDisableAPB2(RCC_APB2ENR_TIM15EN, lp)
+
+/**
+ * @brief   Resets the TIM15 peripheral.
+ *
+ * @api
+ */
+#define rccResetTIM15() rccResetAPB2(RCC_APB2RSTR_TIM15RST)
+
+/**
+ * @brief   Enables the TIM16 peripheral clock.
+ *
+ * @param[in] lp        low power enable flag
+ *
+ * @api
+ */
+#define rccEnableTIM16(lp) rccEnableAPB2(RCC_APB2ENR_TIM16EN, lp)
+
+/**
+ * @brief   Disables the TIM16 peripheral clock.
+ *
+ * @param[in] lp        low power enable flag
+ *
+ * @api
+ */
+#define rccDisableTIM16(lp) rccDisableAPB2(RCC_APB2ENR_TIM16EN, lp)
+
+/**
+ * @brief   Resets the TIM16 peripheral.
+ *
+ * @api
+ */
+#define rccResetTIM16() rccResetAPB2(RCC_APB2RSTR_TIM16RST)
+
+/**
+ * @brief   Enables the TIM17 peripheral clock.
+ *
+ * @param[in] lp        low power enable flag
+ *
+ * @api
+ */
+#define rccEnableTIM17(lp) rccEnableAPB2(RCC_APB2ENR_TIM17EN, lp)
+
+/**
+ * @brief   Disables the TIM17 peripheral clock.
+ *
+ * @param[in] lp        low power enable flag
+ *
+ * @api
+ */
+#define rccDisableTIM17(lp) rccDisableAPB2(RCC_APB2ENR_TIM17EN, lp)
+
+/**
+ * @brief   Resets the TIM17 peripheral.
+ *
+ * @api
+ */
+#define rccResetTIM17() rccResetAPB2(RCC_APB2RSTR_TIM17RST)
+
+/**
+ * @brief   Enables the TIM20 peripheral clock.
+ *
+ * @param[in] lp        low power enable flag
+ *
+ * @api
+ */
+#define rccEnableTIM20(lp) rccEnableAPB2(RCC_APB2ENR_TIM20EN, lp)
+
+/**
+ * @brief   Disables the TIM20 peripheral clock.
+ *
+ * @param[in] lp        low power enable flag
+ *
+ * @api
+ */
+#define rccDisableTIM20(lp) rccDisableAPB2(RCC_APB2ENR_TIM20EN, lp)
+
+/**
+ * @brief   Resets the TIM20 peripheral.
+ *
+ * @api
+ */
+#define rccResetTIM20() rccResetAPB2(RCC_APB2RSTR_TIM20RST)
 /** @} */
 
 /**
@@ -817,6 +996,29 @@
  * @api
  */
 #define rccResetUSB() rccResetAPB1(RCC_APB1RSTR_USBRST)
+/** @} */
+
+/**
+ * @name    FSMC peripherals specific RCC operations
+ * @{
+ */
+/**
+ * @brief   Enables the FMC peripheral clock.
+ *
+ * @param[in] lp        low power enable flag
+ *
+ * @api
+ */
+#define rccEnableFSMC(lp) rccEnableAHB(RCC_AHBENR_FMCEN, lp)
+
+/**
+ * @brief   Disables the FMC peripheral clock.
+ *
+ * @param[in] lp        low power enable flag
+ *
+ * @api
+ */
+#define rccDisableFSMC(lp) rccDisableAHB(RCC_AHBENR_FMCEN, lp)
 /** @} */
 
 /*===========================================================================*/

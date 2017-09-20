@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio.
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio.
 
     This file is part of ChibiOS.
 
@@ -40,6 +40,11 @@
 
 /**
  * @defgroup NIL_CORE Port Layer
+ * @ingroup NIL
+ */
+
+/**
+ * @defgroup NIL_TIMER Timer Interface
  * @ingroup NIL
  */
  

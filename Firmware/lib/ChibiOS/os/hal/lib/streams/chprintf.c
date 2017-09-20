@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -131,12 +131,12 @@ int chvprintf(BaseSequentialStream *chp, const char *fmt, va_list ap) {
   char tmpbuf[MAX_FILLER + 1];
 #endif
 
-  while (TRUE) {
+  while (true) {
     c = *fmt++;
     if (c == 0)
       return n;
     if (c != '%') {
-      chSequentialStreamPut(chp, (uint8_t)c);
+      streamPut(chp, (uint8_t)c);
       n++;
       continue;
     }
@@ -254,22 +254,22 @@ unsigned_common:
       width = -width;
     if (width < 0) {
       if (*s == '-' && filler == '0') {
-        chSequentialStreamPut(chp, (uint8_t)*s++);
+        streamPut(chp, (uint8_t)*s++);
         n++;
         i--;
       }
       do {
-        chSequentialStreamPut(chp, (uint8_t)filler);
+        streamPut(chp, (uint8_t)filler);
         n++;
       } while (++width != 0);
     }
     while (--i >= 0) {
-      chSequentialStreamPut(chp, (uint8_t)*s++);
+      streamPut(chp, (uint8_t)*s++);
       n++;
     }
 
     while (width) {
-      chSequentialStreamPut(chp, (uint8_t)filler);
+      streamPut(chp, (uint8_t)filler);
       n++;
       width--;
     }
@@ -278,8 +278,41 @@ unsigned_common:
 
 /**
  * @brief   System formatted output function.
- * @details This function implements a minimal @p vprintf()-like functionality
+ * @details This function implements a minimal @p printf() like functionality
  *          with output on a @p BaseSequentialStream.
+ *          The general parameters format is: %[-][width|*][.precision|*][l|L]p.
+ *          The following parameter types (p) are supported:
+ *          - <b>x</b> hexadecimal integer.
+ *          - <b>X</b> hexadecimal long.
+ *          - <b>o</b> octal integer.
+ *          - <b>O</b> octal long.
+ *          - <b>d</b> decimal signed integer.
+ *          - <b>D</b> decimal signed long.
+ *          - <b>u</b> decimal unsigned integer.
+ *          - <b>U</b> decimal unsigned long.
+ *          - <b>c</b> character.
+ *          - <b>s</b> string.
+ *          .
+ *
+ * @param[in] chp       pointer to a @p BaseSequentialStream implementing object
+ * @param[in] fmt       formatting string
+ *
+ * @api
+ */
+int chprintf(BaseSequentialStream *chp, const char *fmt, ...) {
+  va_list ap;
+  int formatted_bytes;
+
+  va_start(ap, fmt);
+  formatted_bytes = chvprintf(chp, fmt, ap);
+  va_end(ap);
+
+  return formatted_bytes;
+}
+
+/**
+ * @brief   System formatted output function.
+ * @details This function implements a minimal @p snprintf()-like functionality.
  *          The general parameters format is: %[-][width|*][.precision|*][l|L]p.
  *          The following parameter types (p) are supported:
  *          - <b>x</b> hexadecimal integer.

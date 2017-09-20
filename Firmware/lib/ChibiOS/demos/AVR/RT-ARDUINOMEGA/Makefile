@@ -63,17 +63,17 @@ include $(CHIBIOS)/os/hal/boards/ARDUINO_MEGA/board.mk
 include $(CHIBIOS)/os/hal/ports/AVR/platform.mk
 include $(CHIBIOS)/os/hal/osal/rt/osal.mk
 include $(CHIBIOS)/os/rt/rt.mk
-include $(CHIBIOS)/os/rt/ports/AVR/compilers/GCC/mk/port.mk
+include $(CHIBIOS)/os/common/ports/AVR/compilers/GCC/mk/port.mk
 include $(CHIBIOS)/test/rt/test.mk
 
 # List C source files here. (C dependencies are automatically generated.)
-SRC = $(PORTSRC) \
-      $(KERNSRC) \
-      $(TESTSRC) \
-      $(HALSRC) \
+SRC = $(KERNSRC) \
+      $(PORTSRC) \
       $(OSALSRC) \
+      $(HALSRC) \
       $(PLATFORMSRC) \
       $(BOARDSRC) \
+      $(TESTSRC) \
       $(CHIBIOS)/os/various/evtimer.c \
       main.c
 
@@ -104,7 +104,7 @@ DEBUG = dwarf-2
 #     Each directory must be seperated by a space.
 #     Use forward slashes for directory separators.
 #     For a directory that has spaces, enclose it in quotes.
-EXTRAINCDIRS = $(PORTINC) $(KERNINC) $(TESTINC) \
+EXTRAINCDIRS = $(CHIBIOS)/os/license $(PORTINC) $(KERNINC) $(TESTINC) \
                $(HALINC) $(OSALINC) $(PLATFORMINC) \
                $(BOARDINC) $(CHIBIOS)/os/various
 
@@ -151,6 +151,9 @@ CFLAGS += -Wstrict-prototypes
 CFLAGS += -Wa,-adhlns=$(<:%.c=$(OBJDIR)/%.lst)
 CFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS))
 CFLAGS += $(CSTANDARD)
+CFLAGS += -mrelax
+CFLAGS += -fdata-sections
+CFLAGS += -ffunction-sections
 
 #---------------- Compiler Options C++ ----------------
 #  -g*:          generate debugging information
@@ -177,6 +180,8 @@ CFLAGS += -Wundef
 CPPFLAGS += -Wa,-adhlns=$(<:%.cpp=$(OBJDIR)/%.lst)
 CPPFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS))
 #CPPFLAGS += $(CSTANDARD)
+CPPFLAGS += -fdata-sections
+CPPFLAGS += -ffunction-sections
 
 #---------------- Assembler Options ----------------
 #  -Wa,...:   tell GCC to pass this to the assembler.
@@ -236,7 +241,7 @@ EXTMEMOPTS =
 #  -Wl,...:     tell GCC to pass this to linker.
 #    -Map:      create map file
 #    --cref:    add cross reference to  map file
-LDFLAGS = -Wl,-Map=$(TARGET).map,--cref
+LDFLAGS = -Wl,-Map=$(TARGET).map,--cref,--gc-sections
 LDFLAGS += $(EXTMEMOPTS)
 LDFLAGS += $(patsubst %,-L%,$(EXTRALIBDIRS))
 LDFLAGS += $(PRINTF_LIB) $(SCANF_LIB) $(MATH_LIB)

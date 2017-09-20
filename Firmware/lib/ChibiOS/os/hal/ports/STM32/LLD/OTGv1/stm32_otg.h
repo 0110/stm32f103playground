@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -15,27 +15,15 @@
 */
 
 /**
- * @file    stm32_otg.h
+ * @file    OTGv1/stm32_otg.h
  * @brief   STM32 OTG registers layout header.
  *
  * @addtogroup USB
  * @{
  */
 
-#ifndef _STM32_OTG_H_
-#define _STM32_OTG_H_
-
-/**
- * @brief   Number of the implemented endpoints in OTG_FS.
- * @details This value does not include the endpoint 0 that is always present.
- */
-#define STM32_OTG1_ENDOPOINTS_NUMBER    3
-
-/**
- * @brief   Number of the implemented endpoints in OTG_HS.
- * @details This value does not include the endpoint 0 that is always present.
- */
-#define STM32_OTG2_ENDOPOINTS_NUMBER    5
+#ifndef STM32_OTG_H
+#define STM32_OTG_H
 
 /**
  * @brief   OTG_FS FIFO memory size in words.
@@ -189,10 +177,17 @@ typedef struct {
 #define GOTGCTL_ASVLD           (1U<<18)    /**< A-Session Valid.           */
 #define GOTGCTL_DBCT            (1U<<17)    /**< Long/Short debounce time.  */
 #define GOTGCTL_CIDSTS          (1U<<16)    /**< Connector ID status.       */
+#define GOTGCTL_EHEN            (1U<<12)
 #define GOTGCTL_DHNPEN          (1U<<11)    /**< Device HNP enabled.        */
 #define GOTGCTL_HSHNPEN         (1U<<10)    /**< Host Set HNP enable.       */
 #define GOTGCTL_HNPRQ           (1U<<9)     /**< HNP request.               */
 #define GOTGCTL_HNGSCS          (1U<<8)     /**< Host negotiation success.  */
+#define GOTGCTL_BVALOVAL        (1U<<7)
+#define GOTGCTL_BVALOEN         (1U<<6)
+#define GOTGCTL_AVALOVAL        (1U<<5)
+#define GOTGCTL_AVALOEN         (1U<<4)
+#define GOTGCTL_VBVALOVAL       (1U<<3)
+#define GOTGCTL_VBVALOEN        (1U<<2)
 #define GOTGCTL_SRQ             (1U<<1)     /**< Session request.           */
 #define GOTGCTL_SRQSCS          (1U<<0)     /**< Session request success.   */
 /** @} */
@@ -422,12 +417,16 @@ typedef struct {
  * @name GCCFG register bit definitions
  * @{
  */
+/* Definitions for stepping 1.*/
 #define GCCFG_NOVBUSSENS        (1U<<21)    /**< VBUS sensing disable.      */
 #define GCCFG_SOFOUTEN          (1U<<20)    /**< SOF output enable.         */
 #define GCCFG_VBUSBSEN          (1U<<19)    /**< Enable the VBUS sensing "B"
                                                  device.                    */
 #define GCCFG_VBUSASEN          (1U<<18)    /**< Enable the VBUS sensing "A"
                                                  device.                    */
+
+/* Definitions for stepping 2.*/
+#define GCCFG_VBDEN             (1U<<21)    /**< VBUS sensing enable.       */
 #define GCCFG_PWRDWN            (1U<<16)    /**< Power down.                */
 /** @} */
 
@@ -563,8 +562,8 @@ typedef struct {
 #define HCCHAR_EPDIR            (1U<<15)    /**< Endpoint direction.        */
 #define HCCHAR_EPNUM_MASK       (15U<<11)   /**< Endpoint number mask.      */
 #define HCCHAR_EPNUM(n)         ((n)<<11)   /**< Endpoint number value.     */
-#define HCCHAR_MPS_MASK         (11U<<0)    /**< Maximum packet size mask.  */
-#define HCCHAR_MPS(n)           (11U<<0)    /**< Maximum packet size value. */
+#define HCCHAR_MPS_MASK         (0x7FFU<<0) /**< Maximum packet size mask.  */
+#define HCCHAR_MPS(n)           ((n)<<0)    /**< Maximum packet size value. */
 /** @} */
 
 /**
@@ -582,6 +581,7 @@ typedef struct {
                                                  interrupt.                 */
 #define HCINT_STALL             (1U<<3)     /**< STALL response received
                                                  interrupt.                 */
+#define HCINT_AHBERR            (1U<<2)     /**< AHB error interrupt.       */
 #define HCINT_CHH               (1U<<1)     /**< Channel halted.            */
 #define HCINT_XFRC              (1U<<0)     /**< Transfer completed.        */
 /** @} */
@@ -603,6 +603,7 @@ typedef struct {
                                                  interrupt mask.            */
 #define HCINTMSK_STALLM         (1U<<3)     /**< STALL response received
                                                  interrupt mask.            */
+#define HCINTMSK_AHBERRM        (1U<<2)     /**< AHB error interrupt mask.  */
 #define HCINTMSK_CHHM           (1U<<1)     /**< Channel halted mask.       */
 #define HCINTMSK_XFRCM          (1U<<0)     /**< Transfer completed mask.   */
 /** @} */
@@ -616,6 +617,7 @@ typedef struct {
 #define HCTSIZ_DPID_DATA2       (1U<<29)    /**< DATA2.                     */
 #define HCTSIZ_DPID_DATA1       (2U<<29)    /**< DATA1.                     */
 #define HCTSIZ_DPID_MDATA       (3U<<29)    /**< MDATA.                     */
+#define HCTSIZ_DPID_SETUP       (3U<<29)    /**< SETUP.                     */
 #define HCTSIZ_PKTCNT_MASK      (0x3FFU<<19)/**< Packet count mask.         */
 #define HCTSIZ_PKTCNT(n)        ((n)<<19)   /**< Packet count value.        */
 #define HCTSIZ_XFRSIZ_MASK      (0x7FFFF<<0)/**< Transfer size mask.        */
@@ -671,10 +673,13 @@ typedef struct {
                                                  SOF mask.                  */
 #define DSTS_FNSOF(n)           ((n)<<8)    /**< Frame number of the received
                                                  SOF value.                 */
+#define DSTS_FNSOF_ODD          (1U<<8)     /**< Frame parity of the received
+                                                 SOF value.                 */
 #define DSTS_EERR               (1U<<3)     /**< Erratic error.             */
 #define DSTS_ENUMSPD_MASK       (3U<<1)     /**< Enumerated speed mask.     */
 #define DSTS_ENUMSPD_FS_48      (3U<<1)     /**< Full speed (PHY clock is
                                                  running at 48 MHz).        */
+#define DSTS_ENUMSPD_HS_480     (0U<<1)     /**< High speed.                */
 #define DSTS_SUSPSTS            (1U<<0)     /**< Suspend status.            */
 /** @} */
 
@@ -911,6 +916,6 @@ typedef struct {
  */
 #define OTG_HS                      ((stm32_otg_t *)OTG_HS_ADDR)
 
-#endif /* _STM32_OTG_H_ */
+#endif /* STM32_OTG_H */
 
 /** @} */

@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -99,17 +99,18 @@ void sys_sem_signal_S(sys_sem_t *sem) {
 }
 
 u32_t sys_arch_sem_wait(sys_sem_t *sem, u32_t timeout) {
-  systime_t time, tmo;
+  systime_t tmo, start, remaining;
 
   osalSysLock();
-  tmo = timeout > 0 ? (systime_t)timeout : TIME_INFINITE;
-  time = osalOsGetSystemTimeX();
-  if (chSemWaitTimeoutS(*sem, tmo) != MSG_OK)
-    time = SYS_ARCH_TIMEOUT;
-  else
-    time = osalOsGetSystemTimeX() - time;
+  tmo = timeout > 0 ? MS2ST((systime_t)timeout) : TIME_INFINITE;
+  start = osalOsGetSystemTimeX();
+  if (chSemWaitTimeoutS(*sem, tmo) != MSG_OK) {
+    osalSysUnlock();
+    return SYS_ARCH_TIMEOUT;
+  }
+  remaining = osalOsGetSystemTimeX() - start;
   osalSysUnlock();
-  return time;
+  return (u32_t)ST2MS(remaining);
 }
 
 int sys_sem_valid(sys_sem_t *sem) {
@@ -170,17 +171,18 @@ err_t sys_mbox_trypost(sys_mbox_t *mbox, void *msg) {
 }
 
 u32_t sys_arch_mbox_fetch(sys_mbox_t *mbox, void **msg, u32_t timeout) {
-  systime_t time, tmo;
+  systime_t tmo, start, remaining;
 
   osalSysLock();
-  tmo = timeout > 0 ? (systime_t)timeout : TIME_INFINITE;
-  time = osalOsGetSystemTimeX();
-  if (chMBFetchS(*mbox, (msg_t *)msg, tmo) != MSG_OK)
-    time = SYS_ARCH_TIMEOUT;
-  else
-    time = osalOsGetSystemTimeX() - time;
+  tmo = timeout > 0 ? MS2ST((systime_t)timeout) : TIME_INFINITE;
+  start = osalOsGetSystemTimeX();
+  if (chMBFetchS(*mbox, (msg_t *)msg, tmo) != MSG_OK) {
+    osalSysUnlock();
+    return SYS_ARCH_TIMEOUT;
+  }
+  remaining = osalOsGetSystemTimeX() - start;
   osalSysUnlock();
-  return time;
+  return (u32_t)ST2MS(remaining);
 }
 
 u32_t sys_arch_mbox_tryfetch(sys_mbox_t *mbox, void **msg) {
@@ -202,28 +204,21 @@ void sys_mbox_set_invalid(sys_mbox_t *mbox) {
 
 sys_thread_t sys_thread_new(const char *name, lwip_thread_fn thread,
                             void *arg, int stacksize, int prio) {
+  thread_t *tp;
 
-  size_t wsz;
-  void *wsp;
-
-  (void)name;
-  wsz = THD_WORKING_AREA_SIZE(stacksize);
-  wsp = chCoreAlloc(wsz);
-  if (wsp == NULL)
-    return NULL;
-  return (sys_thread_t)chThdCreateStatic(wsp, wsz, prio, (tfunc_t)thread, arg);
+  tp = chThdCreateFromHeap(NULL, THD_WORKING_AREA_SIZE(stacksize),
+                           name, prio, (tfunc_t)thread, arg);
+  return (sys_thread_t)tp;
 }
 
 sys_prot_t sys_arch_protect(void) {
 
-  osalSysLock();
-  return 0;
+  return chSysGetStatusAndLockX();
 }
 
 void sys_arch_unprotect(sys_prot_t pval) {
 
-  (void)pval;
-  osalSysUnlock();
+  osalSysRestoreStatusX((syssts_t)pval);
 }
 
 u32_t sys_now(void) {

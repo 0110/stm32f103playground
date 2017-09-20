@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@
 /*
  * MCU type as defined in the ST header file stm32f2xx.h.
  */
-#define STM32F2XX
+#define STM32F207xx
 
 /*
  * IO pins assignments.

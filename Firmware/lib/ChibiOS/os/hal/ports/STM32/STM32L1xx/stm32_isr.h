@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@
  * @{
  */
 
-#ifndef _STM32_ISR_H_
-#define _STM32_ISR_H_
+#ifndef STM32_ISR_H
+#define STM32_ISR_H
 
 /*===========================================================================*/
 /* Driver constants.                                                         */
@@ -52,12 +52,22 @@
 #define STM32_TIM2_HANDLER          VectorB0
 #define STM32_TIM3_HANDLER          VectorB4
 #define STM32_TIM4_HANDLER          VectorB8
+#define STM32_TIM5_HANDLER          VectorF8
+#define STM32_TIM6_HANDLER          VectorEC
+#define STM32_TIM7_HANDLER          VectorF0
 #define STM32_TIM9_HANDLER          VectorA4
+#define STM32_TIM10_HANDLER         VectorA8
+#define STM32_TIM11_HANDLER         VectorAC
 
 #define STM32_TIM2_NUMBER           28
 #define STM32_TIM3_NUMBER           29
 #define STM32_TIM4_NUMBER           30
+#define STM32_TIM5_NUMBER           46
+#define STM32_TIM6_NUMBER           43
+#define STM32_TIM7_NUMBER           44
 #define STM32_TIM9_NUMBER           25
+#define STM32_TIM10_NUMBER          26
+#define STM32_TIM11_NUMBER          27
 
 /*
  * USART units.
@@ -65,16 +75,19 @@
 #define STM32_USART1_HANDLER        VectorD4
 #define STM32_USART2_HANDLER        VectorD8
 #define STM32_USART3_HANDLER        VectorDC
+#define STM32_UART4_HANDLER         Vector100
+#define STM32_UART5_HANDLER         Vector104
 
 #define STM32_USART1_NUMBER         37
 #define STM32_USART2_NUMBER         38
 #define STM32_USART3_NUMBER         39
-
+#define STM32_UART4_NUMBER          48
+#define STM32_UART5_NUMBER          49
 /*
  * USB units.
  */
 #define STM32_USB1_HP_HANDLER       Vector8C
-#define STM32_USB1_LP_HANDLER       Vector30
+#define STM32_USB1_LP_HANDLER       Vector90
 
 #define STM32_USB1_HP_NUMBER        19
 #define STM32_USB1_LP_NUMBER        20
@@ -100,6 +113,6 @@
 /* External declarations.                                                    */
 /*===========================================================================*/
 
-#endif /* _STM32_ISR_H_ */
+#endif /* STM32_ISR_H */
 
 /** @} */

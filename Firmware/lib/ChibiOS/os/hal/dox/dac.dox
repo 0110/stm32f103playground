@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 /**
  * @defgroup DAC DAC Driver
- * @brief Generic DAC driver.
+ * @brief Generic DAC Driver.
  * @details This module implements a generic DAC (Digital to Analog Converter)
  *          driver.
  * @pre     In order to use the MAC driver the @p HAL_USE_DAC option

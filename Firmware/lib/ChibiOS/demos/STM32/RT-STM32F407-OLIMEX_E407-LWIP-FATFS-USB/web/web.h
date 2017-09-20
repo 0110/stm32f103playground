@@ -1,5 +1,5 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006-2013 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -21,8 +21,8 @@
  * @{
  */
 
-#ifndef _WEB_H_
-#define _WEB_H_
+#ifndef WEB_H
+#define WEB_H
 
 #ifndef WEB_THREAD_STACK_SIZE
 #define WEB_THREAD_STACK_SIZE   1024
@@ -41,11 +41,11 @@ extern THD_WORKING_AREA(wa_http_server, WEB_THREAD_STACK_SIZE);
 #ifdef __cplusplus
 extern "C" {
 #endif
-  msg_t http_server(void *p);
+  THD_FUNCTION(http_server, p);
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* _WEB_H_ */
+#endif /* WEB_H */
 
 /** @} */

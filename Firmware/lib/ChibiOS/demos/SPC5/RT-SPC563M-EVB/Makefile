@@ -43,6 +43,12 @@ ifeq ($(USE_VERBOSE_COMPILE),)
   USE_VERBOSE_COMPILE = no
 endif
 
+# If enabled, this option makes the build process faster by not compiling
+# modules not used in the current configuration.
+ifeq ($(USE_SMART_BUILD),)
+  USE_SMART_BUILD = yes
+endif
+
 #
 # Build global options
 ##############################################################################
@@ -76,39 +82,48 @@ PROJECT = ch
 
 # Imported source files and paths
 CHIBIOS = ../../..
+# Startup files.
+include $(CHIBIOS)/os/common/startup/e200/compilers/GCC/mk/startup_spc563mxx.mk
+# HAL-OSAL files (optional).
 include $(CHIBIOS)/os/hal/hal.mk
 include $(CHIBIOS)/os/hal/boards/ST_EVB_SPC563M/board.mk
 include $(CHIBIOS)/os/hal/ports/SPC5/SPC563Mxx/platform.mk
 include $(CHIBIOS)/os/hal/osal/rt/osal.mk
+# RTOS files (optional).
 include $(CHIBIOS)/os/rt/rt.mk
-include $(CHIBIOS)/os/rt/ports/e200/compilers/GCC/mk/port_spc563mxx.mk
+include $(CHIBIOS)/os/common/ports/e200/compilers/GCC/mk/port.mk
+# Other files (optional).
 include $(CHIBIOS)/test/rt/test.mk
+include $(CHIBIOS)/os/hal/lib/streams/streams.mk
+include $(CHIBIOS)/os/various/shell/shell.mk
 
 # Define linker script file here
-LDSCRIPT= $(PORTLD)/SPC563M64.ld
+LDSCRIPT= $(STARTUPLD)/SPC563M64.ld
 
 # C sources here.
-CSRC = $(PORTSRC) \
+CSRC = $(STARTUPSRC) \
        $(KERNSRC) \
-       $(TESTSRC) \
-       $(HALSRC) \
+       $(PORTSRC) \
        $(OSALSRC) \
+       $(HALSRC) \
        $(PLATFORMSRC) \
        $(BOARDSRC) \
-       $(CHIBIOS)/os/hal/lib/streams/memstreams.c \
-       $(CHIBIOS)/os/hal/lib/streams/chprintf.c \
-       $(CHIBIOS)/os/various/shell.c \
+       $(TESTSRC) \
+       $(STREAMSSRC) \
+       $(SHELLSRC) \
        main.c
 
 # C++ sources here.
 CPPSRC =
 
 # List ASM source files here
-ASMSRC = $(PORTASM)
+ASMSRC =
+ASMXSRC = $(STARTUPASM) $(PORTASM) $(OSALASM)
 
-INCDIR = $(PORTINC) $(KERNINC) $(TESTINC) \
-         $(HALINC) $(OSALINC) $(PLATFORMINC) $(BOARDINC) \
-         $(CHIBIOS)/os/various
+INCDIR = $(CHIBIOS)/os/license \
+         $(STARTUPINC) $(KERNINC) $(PORTINC) $(OSALINC) \
+         $(HALINC) $(PLATFORMINC) $(BOARDINC) $(TESTINC) \
+         $(STREAMSINC) $(SHELLINC)
 
 #
 # Project, sources and paths
@@ -118,11 +133,12 @@ INCDIR = $(PORTINC) $(KERNINC) $(TESTINC) \
 # Compiler settings
 #
 
-#MCU  = e500mc -meabi -msdata=none -mnew-mnemonics -mregnames
-MCU  = e200zx -meabi -msdata=none -mnew-mnemonics -mregnames
+#MCU  = e200zx -meabi -msdata=none -mnew-mnemonics -mregnames # HighTec
+MCU  = e200z3 -meabi -msdata=none -mregnames # Free GCC
 
-#TRGT = powerpc-eabi-
-TRGT = ppc-vle-
+#TRGT = ppc-vle-
+#TRGT = powerpc-eabivle-
+TRGT = ppc-freevle-eabi-
 CC   = $(TRGT)gcc
 CPPC = $(TRGT)g++
 # Enable loading with g++ only if you need C++ runtime support.
@@ -140,10 +156,10 @@ MOT  = $(CP) -O srec
 BIN  = $(CP) -O binary
 
 # Define C warning options here
-CWARN = -Wall -Wextra -Wstrict-prototypes
+CWARN = -Wall -Wextra -Wundef -Wstrict-prototypes
 
 # Define C++ warning options here
-CPPWARN = -Wall -Wextra
+CPPWARN = -Wall -Wextra -Wundef
 
 #
 # Compiler settings
@@ -172,5 +188,5 @@ ULIBS =
 # End of user defines
 ##############################################################################
 
-RULESPATH = $(CHIBIOS)/os/common/ports/e200/compilers/GCC
+RULESPATH = $(CHIBIOS)/os/common/startup/e200/compilers/GCC
 include $(RULESPATH)/rules.mk

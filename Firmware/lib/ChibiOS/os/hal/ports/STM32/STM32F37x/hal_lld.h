@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -34,8 +34,8 @@
  * @{
  */
 
-#ifndef _HAL_LLD_H_
-#define _HAL_LLD_H_
+#ifndef HAL_LLD_H
+#define HAL_LLD_H
 
 /*===========================================================================*/
 /* Driver constants.                                                         */
@@ -891,9 +891,9 @@
 #define STM32_USART1CLK             STM32_PCLK2
 #elif STM32_USART1SW == STM32_USART1SW_SYSCLK
 #define STM32_USART1CLK             STM32_SYSCLK
-#elif STM32_USART1SW == STM32_USART1SW_LSECLK
+#elif STM32_USART1SW == STM32_USART1SW_LSE
 #define STM32_USART1CLK             STM32_LSECLK
-#elif STM32_USART1SW == STM32_USART1SW_HSICLK
+#elif STM32_USART1SW == STM32_USART1SW_HSI
 #define STM32_USART1CLK             STM32_HSICLK
 #else
 #error "invalid source selected for USART1 clock"
@@ -906,9 +906,9 @@
 #define STM32_USART2CLK             STM32_PCLK1
 #elif STM32_USART2SW == STM32_USART2SW_SYSCLK
 #define STM32_USART2CLK             STM32_SYSCLK
-#elif STM32_USART2SW == STM32_USART2SW_LSECLK
+#elif STM32_USART2SW == STM32_USART2SW_LSE
 #define STM32_USART2CLK             STM32_LSECLK
-#elif STM32_USART2SW == STM32_USART2SW_HSICLK
+#elif STM32_USART2SW == STM32_USART2SW_HSI
 #define STM32_USART2CLK             STM32_HSICLK
 #else
 #error "invalid source selected for USART2 clock"
@@ -921,9 +921,9 @@
 #define STM32_USART3CLK             STM32_PCLK1
 #elif STM32_USART3SW == STM32_USART3SW_SYSCLK
 #define STM32_USART3CLK             STM32_SYSCLK
-#elif STM32_USART3SW == STM32_USART3SW_LSECLK
+#elif STM32_USART3SW == STM32_USART3SW_LSE
 #define STM32_USART3CLK             STM32_LSECLK
-#elif STM32_USART3SW == STM32_USART3SW_HSICLK
+#elif STM32_USART3SW == STM32_USART3SW_HSI
 #define STM32_USART3CLK             STM32_HSICLK
 #else
 #error "invalid source selected for USART3 clock"
@@ -997,6 +997,6 @@ extern "C" {
 }
 #endif
 
-#endif /* _HAL_LLD_H_ */
+#endif /* HAL_LLD_H */
 
 /** @} */

@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@
  * @{
  */
 
-#ifndef _OSAL_H_
-#define _OSAL_H_
+#ifndef OSAL_H
+#define OSAL_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -363,6 +363,52 @@ typedef struct {
 /** @} */
 
 /**
+ * @name    Time conversion utilities for the realtime counter
+ * @{
+ */
+/**
+ * @brief   Seconds to realtime counter.
+ * @details Converts from seconds to realtime counter cycles.
+ * @note    The macro assumes that @p freq >= @p 1.
+ *
+ * @param[in] freq      clock frequency, in Hz, of the realtime counter
+ * @param[in] sec       number of seconds
+ * @return              The number of cycles.
+ *
+ * @api
+ */
+#define OSAL_S2RTC(freq, sec) ((freq) * (sec))
+
+/**
+ * @brief   Milliseconds to realtime counter.
+ * @details Converts from milliseconds to realtime counter cycles.
+ * @note    The result is rounded upward to the next millisecond boundary.
+ * @note    The macro assumes that @p freq >= @p 1000.
+ *
+ * @param[in] freq      clock frequency, in Hz, of the realtime counter
+ * @param[in] msec      number of milliseconds
+ * @return              The number of cycles.
+ *
+ * @api
+ */
+#define OSAL_MS2RTC(freq, msec) (rtcnt_t)((((freq) + 999UL) / 1000UL) * (msec))
+
+/**
+ * @brief   Microseconds to realtime counter.
+ * @details Converts from microseconds to realtime counter cycles.
+ * @note    The result is rounded upward to the next microsecond boundary.
+ * @note    The macro assumes that @p freq >= @p 1000000.
+ *
+ * @param[in] freq      clock frequency, in Hz, of the realtime counter
+ * @param[in] usec      number of microseconds
+ * @return              The number of cycles.
+ *
+ * @api
+ */
+#define OSAL_US2RTC(freq, usec) (rtcnt_t)((((freq) + 999999UL) / 1000000UL) * (usec))
+/** @} */
+
+/**
  * @name    Sleep macros using absolute time
  * @{
  */
@@ -515,7 +561,7 @@ static inline void osalSysUnlockFromISR(void) {
  *
  * @xclass
  */
-static inline syssts_t osalSysGetStatusAndLockX(void)  {
+static inline syssts_t osalSysGetStatusAndLockX(void) {
 
   return (syssts_t)0;
 }
@@ -597,6 +643,6 @@ static inline void osalMutexObjectInit(mutex_t *mp) {
   *mp = 0;
 }
 
-#endif /* _OSAL_H_ */
+#endif /* OSAL_H */
 
 /** @} */

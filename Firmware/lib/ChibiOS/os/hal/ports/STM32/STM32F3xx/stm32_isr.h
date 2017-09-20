@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@
  * @{
  */
 
-#ifndef _STM32_ISR_H_
-#define _STM32_ISR_H_
+#ifndef STM32_ISR_H
+#define STM32_ISR_H
 
 /*===========================================================================*/
 /* Driver constants.                                                         */
@@ -58,6 +58,11 @@
 #define STM32_I2C2_ERROR_HANDLER    VectorC8
 #define STM32_I2C2_EVENT_NUMBER     33
 #define STM32_I2C2_ERROR_NUMBER     34
+
+#define STM32_I2C3_EVENT_HANDLER    Vector160
+#define STM32_I2C3_ERROR_HANDLER    Vector164
+#define STM32_I2C3_EVENT_NUMBER     72
+#define STM32_I2C3_ERROR_NUMBER     73
 
 /*
  * TIM units.
@@ -127,6 +132,6 @@
 /* External declarations.                                                    */
 /*===========================================================================*/
 
-#endif /* _STM32_ISR_H_ */
+#endif /* STM32_ISR_H */
 
 /** @} */

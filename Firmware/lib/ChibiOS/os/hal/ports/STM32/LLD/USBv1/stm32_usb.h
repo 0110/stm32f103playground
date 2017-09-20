@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 */
 
 /**
- * @file    stm32_usb.h
+ * @file    USBv1/stm32_usb.h
  * @brief   STM32 USB registers layout header.
  * @note    This file requires definitions from the ST STM32 header files
  *          stm32f10x.h or stm32l1xx.h.
@@ -24,8 +24,8 @@
  * @{
  */
 
-#ifndef _STM32_USB_H_
-#define _STM32_USB_H_
+#ifndef STM32_USB_H
+#define STM32_USB_H
 
 /**
  * @brief   Number of the available endpoints.
@@ -112,6 +112,8 @@ typedef struct {
  * @name    Register aliases
  * @{
  */
+#define RXCOUNT1                TXCOUNT0
+#define TXCOUNT1                RXCOUNT0
 #define RXADDR1                 TXADDR0
 #define TXADDR1                 RXADDR0
 /** @} */
@@ -247,7 +249,7 @@ typedef struct {
  */
 #define USB_GET_DESCRIPTOR(ep)                                              \
   ((stm32_usb_descriptor_t *)((uint32_t)STM32_USBRAM_BASE +                 \
-                              (uint32_t)STM32_USB->BTABLE * 2 +             \
+                              (uint32_t)STM32_USB->BTABLE +                 \
                               (uint32_t)(ep) *                              \
                               sizeof(stm32_usb_descriptor_t)))
 
@@ -259,6 +261,6 @@ typedef struct {
                        (sizeof(stm32_usb_pma_t) / 2) +                      \
                        STM32_USBRAM_BASE))
 
-#endif /* _STM32_USB_H_ */
+#endif /* STM32_USB_H */
 
 /** @} */

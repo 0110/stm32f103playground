@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -15,16 +15,16 @@
 */
 
 /**
- * @file    stm32_tim.h
- * @brief   STM32 TIM registers layout header.
+ * @file    TIMv1/stm32_tim.h
+ * @brief   STM32 TIM units common header.
  * @note    This file requires definitions from the ST STM32 header file.
  *
  * @addtogroup STM32_TIMv1
  * @{
  */
 
-#ifndef _STM32_TIM_H_
-#define _STM32_TIM_H_
+#ifndef STM32_TIM_H
+#define STM32_TIM_H
 
 /*===========================================================================*/
 /* Driver constants.                                                         */
@@ -392,6 +392,9 @@
 #define STM32_TIM17     ((stm32_tim_t *)TIM17_BASE)
 #define STM32_TIM18     ((stm32_tim_t *)TIM18_BASE)
 #define STM32_TIM19     ((stm32_tim_t *)TIM19_BASE)
+#define STM32_TIM20     ((stm32_tim_t *)TIM20_BASE)
+#define STM32_TIM21     ((stm32_tim_t *)TIM21_BASE)
+#define STM32_TIM22     ((stm32_tim_t *)TIM22_BASE)
 /** @} */
 
 /*===========================================================================*/
@@ -442,6 +445,6 @@ typedef struct {
 /* External declarations.                                                    */
 /*===========================================================================*/
 
-#endif /* _STM32_TIM_H_ */
+#endif /* STM32_TIM_H */
 
 /** @} */

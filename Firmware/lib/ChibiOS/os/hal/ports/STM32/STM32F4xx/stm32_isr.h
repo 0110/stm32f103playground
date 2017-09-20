@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@
  * @{
  */
 
-#ifndef _STM32_ISR_H_
-#define _STM32_ISR_H_
+#ifndef STM32_ISR_H
+#define STM32_ISR_H
 
 /*===========================================================================*/
 /* Driver constants.                                                         */
@@ -138,6 +138,8 @@
 #define STM32_UART4_HANDLER         Vector110
 #define STM32_UART5_HANDLER         Vector114
 #define STM32_USART6_HANDLER        Vector15C
+#define STM32_UART7_HANDLER         Vector188
+#define STM32_UART8_HANDLER         Vector18C
 
 #define STM32_USART1_NUMBER         37
 #define STM32_USART2_NUMBER         38
@@ -145,6 +147,8 @@
 #define STM32_UART4_NUMBER          52
 #define STM32_UART5_NUMBER          53
 #define STM32_USART6_NUMBER         71
+#define STM32_UART7_NUMBER          82
+#define STM32_UART8_NUMBER          83
 
 /*
  * Ethernet
@@ -157,6 +161,22 @@
 #define STM32_FSMC_HANDLER          Vector100
 
 #define STM32_FSMC_NUMBER           48
+
+/*
+ * LTDC
+ */
+#define STM32_LTDC_EV_HANDLER       Vector1A0
+#define STM32_LTDC_ER_HANDLER       Vector1A4
+
+#define STM32_LTDC_EV_NUMBER        88
+#define STM32_LTDC_ER_NUMBER        89
+
+/*
+ * DMA2D
+ */
+#define STM32_DMA2D_HANDLER         Vector1A8
+
+#define STM32_DMA2D_NUMBER          90
 
 /** @} */
 
@@ -180,6 +200,6 @@
 /* External declarations.                                                    */
 /*===========================================================================*/
 
-#endif /* _STM32_ISR_H_ */
+#endif /* STM32_ISR_H */
 
 /** @} */

@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 #include "ch.hpp"
 #include "hal.h"
-#include "test.h"
+#include "ch_test.h"
 
 using namespace chibios_rt;
 
@@ -87,20 +87,20 @@ private:
   const seqop_t *base, *curr;                   // Thread local variables.
 
 protected:
-  virtual msg_t main(void) {
+  virtual void main(void) {
 
     setName("sequencer");
 
     while (true) {
       switch(curr->action) {
       case SLEEP:
-        sleep(curr->value);
+        sleep(MS2ST(curr->value));
         break;
       case GOTO:
         curr = &base[curr->value];
         continue;
       case STOP:
-        return 0;
+        return;
       case BITCLEAR:
         palClearPort(GPIOD, curr->value);
         break;
@@ -125,11 +125,12 @@ public:
 class TesterThread : public BaseStaticThread<256> {
 
 protected:
-  virtual msg_t main(void) {
+  virtual void main(void) {
 
     setName("tester");
 
-    return TestThread(&SD2);
+    test_execute((BaseSequentialStream *)&SD2);
+    exit(test_global_fail);
   }
 
 public:

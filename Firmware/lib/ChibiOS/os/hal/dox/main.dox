@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -123,6 +123,13 @@
 /**
  * @defgroup HAL_INNER_CODE Inner Code
  * @brief   HAL Inner Code.
+ *
+ * @ingroup IO
+ */
+
+/**
+ * @defgroup HAL_SUPPORT Support Code
+ * @brief   HAL Support Code.
  *
  * @ingroup IO
  */

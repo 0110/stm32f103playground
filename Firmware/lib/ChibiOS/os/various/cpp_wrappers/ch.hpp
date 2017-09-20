@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -55,21 +55,76 @@ namespace chibios_rt {
      *
      * @special
      */
-    static void init(void);
+    static inline void init(void) {
+
+      chSysInit();
+    }
+
+    /**
+     * @brief   Halts the system.
+     * @details This function is invoked by the operating system when an
+     *          unrecoverable error is detected, for example because a programming
+     *          error in the application code that triggers an assertion while
+     *          in debug mode.
+     * @note    Can be invoked from any system state.
+     *
+     * @param[in] reason        pointer to an error string
+     *
+     * @special
+     */
+    static inline void halt(const char *reason) {
+
+      chSysHalt(reason);
+    }
+
+    /**
+     * @brief   System integrity check.
+     * @details Performs an integrity check of the important ChibiOS/RT data
+     *          structures.
+     * @note    The appropriate action in case of failure is to halt the system
+     *          before releasing the critical zone.
+     * @note    If the system is corrupted then one possible outcome of this
+     *          function is an exception caused by @p NULL or corrupted pointers
+     *          in list elements. Exception vectors must be monitored as well.
+     * @note    This function is not used internally, it is up to the
+     *          application to define if and where to perform system
+     *          checking.
+     * @note    Performing all tests at once can be a slow operation and can
+     *          degrade the system response time. It is suggested to execute
+     *          one test at time and release the critical zone in between tests.
+     *
+     * @param[in] testmask  Each bit in this mask is associated to a test to be
+     *                      performed.
+     * @return              The test result.
+     * @retval false        The test succeeded.
+     * @retval true         Test failed.
+     *
+     * @iclass
+     */
+    static inline bool integrityCheckI(unsigned int testmask) {
+
+      return chSysIntegrityCheckI(testmask);
+    }
 
     /**
      * @brief   Enters the kernel lock mode.
      *
      * @special
      */
-    static void lock(void);
+    static inline void lock(void) {
+
+      chSysLock();
+    }
 
     /**
      * @brief   Leaves the kernel lock mode.
      *
      * @special
      */
-    static void unlock(void);
+    static inline void unlock(void) {
+
+      chSysUnlock();
+    }
 
     /**
      * @brief   Enters the kernel lock mode from within an interrupt handler.
@@ -83,7 +138,10 @@ namespace chibios_rt {
      *
      * @special
      */
-    static void lockFromIsr(void);
+    static inline void lockFromIsr(void) {
+
+      chSysLockFromISR();
+    }
 
     /**
      * @brief   Leaves the kernel lock mode from within an interrupt handler.
@@ -98,8 +156,10 @@ namespace chibios_rt {
      *
      * @special
      */
-    static void unlockFromIsr(void);
+    static inline void unlockFromIsr(void) {
 
+      chSysUnlockFromISR();
+    }
 
     /**
      * @brief   Returns the system time as system ticks.
@@ -109,7 +169,23 @@ namespace chibios_rt {
      *
      * @api
      */
-    static systime_t getTime(void);
+    static inline systime_t getTime(void) {
+
+      return chVTGetSystemTime();
+    }
+
+    /**
+     * @brief   Returns the system time as system ticks.
+     * @note    The system tick time interval is implementation dependent.
+     *
+     * @return          The system time.
+     *
+     * @xclass
+     */
+    static inline systime_t getTimeX(void) {
+
+      return chVTGetSystemTimeX();
+    }
 
     /**
      * @brief   Checks if the current system time is within the specified time
@@ -124,12 +200,15 @@ namespace chibios_rt {
      *
      * @api
      */
-    static bool isTimeWithin(systime_t start, systime_t end);
+    static inline bool isSystemTimeWithin(systime_t start, systime_t end) {
+
+      return chVTIsSystemTimeWithin(start, end);
+    }
   };
 
 #if CH_CFG_USE_MEMCORE || defined(__DOXYGEN__)
   /*------------------------------------------------------------------------*
-   * chibios_rt::System                                                     *
+   * chibios_rt::Core                                                       *
    *------------------------------------------------------------------------*/
   /**
    * @brief Class encapsulating the base system functionalities.
@@ -149,7 +228,10 @@ namespace chibios_rt {
      *
      * @api
      */
-    static void *alloc(size_t size);
+    static inline void *alloc(size_t size) {
+
+      return chCoreAlloc(size);
+    }
 
     /**
      * @brief   Allocates a memory block.
@@ -163,16 +245,22 @@ namespace chibios_rt {
      *
      * @iclass
      */
-    static void *allocI(size_t size);
+    static inline void *allocI(size_t size) {
+
+      return chCoreAllocI(size);
+    }
 
     /**
      * @brief   Core memory status.
      *
      * @return              The size, in bytes, of the free core memory.
      *
-     * @api
+     * @xclass
      */
-    static size_t getStatus(void);
+    static inline size_t getStatusX(void) {
+
+      return chCoreGetStatusX();
+    }
   };
 #endif /* CH_CFG_USE_MEMCORE */
 
@@ -207,14 +295,14 @@ namespace chibios_rt {
      *
      * @iclass
      */
-    void setI(systime_t time, vtfunc_t vtfunc, void *par);
+    inline void setI(systime_t time, vtfunc_t vtfunc, void *par);
 
     /**
      * @brief   Resets the timer, if armed.
      *
      * @iclass
      */
-    void resetI();
+    inline void resetI();
 
     /**
      * @brief   Returns the timer status.
@@ -224,7 +312,77 @@ namespace chibios_rt {
      *
      * @iclass
      */
-    bool isArmedI(void);
+    inline bool isArmedI(void);
+  };
+
+  /*------------------------------------------------------------------------*
+   * chibios_rt::ThreadStayPoint                                            *
+   *------------------------------------------------------------------------*/
+  /**
+   * @brief     Thread suspension point class.
+   * @details   This class encapsulates a reference to a suspended thread.
+   */
+  class ThreadStayPoint {
+  public:
+    /**
+     * @brief   Pointer to the system thread.
+     */
+    ::thread_reference_t thread_ref;
+
+    /**
+     * @brief   Suspends the current thread on the reference.
+     * @details The suspended thread becomes the referenced thread. It is
+     *          possible to use this method only if the thread reference
+     *          was set to @p NULL.
+     *
+     * @return                  The incoming message.
+     *
+     * @sclass
+     */
+    inline msg_t suspendS(void);
+
+    /**
+     * @brief   Suspends the current thread on the reference with timeout.
+     * @details The suspended thread becomes the referenced thread. It is
+     *          possible to use this method only if the thread reference
+     *          was set to @p NULL.
+     *
+     *
+     * @param[in] timeout   the number of ticks before the operation timeouts,
+     *                      the following special values are allowed:
+     *                      - @a TIME_IMMEDIATE immediate timeout.
+     *                      - @a TIME_INFINITE no timeout.
+     *                      .
+     * @return              A message specifying how the invoking thread has
+     *                      been released from the semaphore.
+     * @retval MSG_OK       if the binary semaphore has been successfully
+     *                      taken.
+     * @retval MSG_RESET    if the binary semaphore has been reset using
+     *                      @p bsemReset().
+     * @retval MSG_TIMEOUT  if the binary semaphore has not been signaled
+     *                      or reset within the specified timeout.
+     *
+     * @sclass
+     */
+    inline msg_t suspendS(systime_t timeout);
+
+    /**
+     * @brief   Resumes the currently referenced thread, if any.
+     *
+     * @param[in] msg       the wakeup message
+     *
+     * @iclass
+     */
+    inline void resumeI(msg_t msg);
+
+    /**
+     * @brief   Resumes the currently referenced thread, if any.
+     *
+     * @param[in] msg       the wakeup message
+     *
+     * @sclass
+     */
+    inline void resumeS(msg_t msg);
   };
 
   /*------------------------------------------------------------------------*
@@ -262,48 +420,6 @@ namespace chibios_rt {
      *          optional.
      */
     virtual void stop(void);
-
-    /**
-     * @brief   Suspends the current thread on the reference.
-     * @details The suspended thread becomes the referenced thread. It is
-     *          possible to use this method only if the thread reference
-     *          was set to @p NULL.
-     *
-     * @return                  The incoming message.
-     *
-     * @api
-     */
-    msg_t suspend(void);
-
-    /**
-     * @brief   Suspends the current thread on the reference.
-     * @details The suspended thread becomes the referenced thread. It is
-     *          possible to use this method only if the thread reference
-     *          was set to @p NULL.
-     *
-     * @return                  The incoming message.
-     *
-     * @sclass
-     */
-    msg_t suspendS(void);
-
-    /**
-     * @brief   Resumes the currently referenced thread, if any.
-     *
-     * @param[in] msg       the wakeup message
-     *
-     * @api
-     */
-    void resume(msg_t msg);
-
-    /**
-     * @brief   Resumes the currently referenced thread, if any.
-     *
-     * @param[in] msg       the wakeup message
-     *
-     * @iclass
-     */
-    void resumeI(msg_t msg);
 
     /**
      * @brief   Requests a thread termination.
@@ -440,7 +556,7 @@ namespace chibios_rt {
      *
      * @api
      */
-    virtual msg_t main(void);
+    virtual void main(void);
 
     /**
      * @brief   Creates and starts a system thread.
@@ -787,7 +903,7 @@ namespace chibios_rt {
      * @api
      */
     virtual ThreadReference start(tprio_t prio) {
-      msg_t _thd_start(void *arg);
+      void _thd_start(void *arg);
 
       thread_ref = chThdCreateStatic(wa, sizeof(wa), prio, _thd_start, this);
       return *this;
@@ -826,7 +942,7 @@ namespace chibios_rt {
      *          set to the specified, non negative, value.
      * @note    The released threads can recognize they were waked up by a
      *          reset rather than a signal because the @p chSemWait() will
-     *          return @p RDY_RESET instead of @p RDY_OK.
+     *          return @p MSG_RESET instead of @p MSG_OK.
      *
      * @param[in] n         the new value of the semaphore counter. The value
      *                      must be non-negative.
@@ -846,7 +962,7 @@ namespace chibios_rt {
      *          explicit reschedule must not be performed in ISRs.
      * @note    The released threads can recognize they were waked up by a
      *          reset rather than a signal because the @p chSemWait() will
-     *          return @p RDY_RESET instead of @p RDY_OK.
+     *          return @p MSG_RESET instead of @p MSG_OK.
      *
      * @param[in] n         the new value of the semaphore counter. The value
      *                      must be non-negative.
@@ -860,9 +976,9 @@ namespace chibios_rt {
      *
      * @return              A message specifying how the invoking thread has
      *                      been released from the semaphore.
-     * @retval RDY_OK       if the thread has not stopped on the semaphore or
+     * @retval MSG_OK       if the thread has not stopped on the semaphore or
      *                      the semaphore has been signaled.
-     * @retval RDY_RESET    if the semaphore has been reset using
+     * @retval MSG_RESET    if the semaphore has been reset using
      *                      @p chSemReset().
      *
      * @api
@@ -874,9 +990,9 @@ namespace chibios_rt {
      *
      * @return              A message specifying how the invoking thread has
      *                      been released from the semaphore.
-     * @retval RDY_OK       if the thread has not stopped on the semaphore or
+     * @retval MSG_OK       if the thread has not stopped on the semaphore or
      *                      the semaphore has been signaled.
-     * @retval RDY_RESET    if the semaphore has been reset using
+     * @retval MSG_RESET    if the semaphore has been reset using
      *                      @p chSemReset().
      *
      * @sclass
@@ -894,11 +1010,11 @@ namespace chibios_rt {
      *                      .
      * @return              A message specifying how the invoking thread has
      *                      been released from the semaphore.
-     * @retval RDY_OK       if the thread has not stopped on the semaphore or
+     * @retval MSG_OK       if the thread has not stopped on the semaphore or
      *                      the semaphore has been signaled.
-     * @retval RDY_RESET    if the semaphore has been reset using
+     * @retval MSG_RESET    if the semaphore has been reset using
      *                      @p chSemReset().
-     * @retval RDY_TIMEOUT  if the semaphore has not been signaled or reset
+     * @retval MSG_TIMEOUT  if the semaphore has not been signaled or reset
      *                      within the specified timeout.
      *
      * @api
@@ -916,11 +1032,11 @@ namespace chibios_rt {
      *                      .
      * @return              A message specifying how the invoking thread has
      *                      been released from the semaphore.
-     * @retval RDY_OK       if the thread has not stopped on the semaphore or
+     * @retval MSG_OK       if the thread has not stopped on the semaphore or
      *                      the semaphore has been signaled.
-     * @retval RDY_RESET    if the semaphore has been reset using
+     * @retval MSG_RESET    if the semaphore has been reset using
      *                      @p chSemReset().
-     * @retval RDY_TIMEOUT  if the semaphore has not been signaled or reset
+     * @retval MSG_TIMEOUT  if the semaphore has not been signaled or reset
      *                      within the specified timeout.
      *
      * @sclass
@@ -975,9 +1091,9 @@ namespace chibios_rt {
      * @param[in] wsem          @p Semaphore object to wait on
      * @return                  A message specifying how the invoking thread
      *                          has been released from the semaphore.
-     * @retval RDY_OK           if the thread has not stopped on the semaphore
+     * @retval MSG_OK           if the thread has not stopped on the semaphore
      *                          or the semaphore has been signaled.
-     * @retval RDY_RESET        if the semaphore has been reset using
+     * @retval MSG_RESET        if the semaphore has been reset using
      *                          @p chSemReset().
      *
      * @api
@@ -1016,9 +1132,9 @@ namespace chibios_rt {
      *
      * @return              A message specifying how the invoking thread has
      *                      been released from the semaphore.
-     * @retval RDY_OK       if the binary semaphore has been successfully
+     * @retval MSG_OK       if the binary semaphore has been successfully
      *                      taken.
-     * @retval RDY_RESET    if the binary semaphore has been reset using
+     * @retval MSG_RESET    if the binary semaphore has been reset using
      *                      @p bsemReset().
      *
      * @api
@@ -1030,9 +1146,9 @@ namespace chibios_rt {
      *
      * @return              A message specifying how the invoking thread has
      *                      been released from the semaphore.
-     * @retval RDY_OK       if the binary semaphore has been successfully
+     * @retval MSG_OK       if the binary semaphore has been successfully
      *                      taken.
-     * @retval RDY_RESET    if the binary semaphore has been reset using
+     * @retval MSG_RESET    if the binary semaphore has been reset using
      *                      @p bsemReset().
      *
      * @sclass
@@ -1049,11 +1165,11 @@ namespace chibios_rt {
      *                      .
      * @return              A message specifying how the invoking thread has
      *                      been released from the semaphore.
-     * @retval RDY_OK       if the binary semaphore has been successfully
+     * @retval MSG_OK       if the binary semaphore has been successfully
      *                      taken.
-     * @retval RDY_RESET    if the binary semaphore has been reset using
+     * @retval MSG_RESET    if the binary semaphore has been reset using
      *                      @p bsemReset().
-     * @retval RDY_TIMEOUT  if the binary semaphore has not been signaled
+     * @retval MSG_TIMEOUT  if the binary semaphore has not been signaled
      *                      or reset within the specified timeout.
      *
      * @api
@@ -1070,11 +1186,11 @@ namespace chibios_rt {
      *                      .
      * @return              A message specifying how the invoking thread has
      *                      been released from the semaphore.
-     * @retval RDY_OK       if the binary semaphore has been successfully
+     * @retval MSG_OK       if the binary semaphore has been successfully
      *                      taken.
-     * @retval RDY_RESET    if the binary semaphore has been reset using
+     * @retval MSG_RESET    if the binary semaphore has been reset using
      *                      @p bsemReset().
-     * @retval RDY_TIMEOUT  if the binary semaphore has not been signaled
+     * @retval MSG_TIMEOUT  if the binary semaphore has not been signaled
      *                      or reset within the specified timeout.
      *
      * @sclass
@@ -1085,7 +1201,7 @@ namespace chibios_rt {
      * @brief   Reset operation on the binary semaphore.
      * @note    The released threads can recognize they were waked up by a
      *          reset rather than a signal because the @p bsemWait() will
-     *          return @p RDY_RESET instead of @p RDY_OK.
+     *          return @p MSG_RESET instead of @p MSG_OK.
      *
      * @param[in] taken     new state of the binary semaphore
      *                      - @a FALSE, the new state is not taken.
@@ -1100,7 +1216,7 @@ namespace chibios_rt {
      * @brief   Reset operation on the binary semaphore.
      * @note    The released threads can recognize they were waked up by a
      *          reset rather than a signal because the @p bsemWait() will
-     *          return @p RDY_RESET instead of @p RDY_OK.
+     *          return @p MSG_RESET instead of @p MSG_OK.
      * @note    This function does not reschedule.
      *
      * @param[in] taken     new state of the binary semaphore
@@ -1308,9 +1424,9 @@ namespace chibios_rt {
      *
      * @return              A message specifying how the invoking thread has
      *                      been released from the condition variable.
-     * @retval RDY_OK       if the condvar has been signaled using
+     * @retval MSG_OK       if the condvar has been signaled using
      *                      @p chCondSignal().
-     * @retval RDY_RESET    if the condvar has been signaled using
+     * @retval MSG_RESET    if the condvar has been signaled using
      *                      @p chCondBroadcast().
      *
      * @api
@@ -1326,9 +1442,9 @@ namespace chibios_rt {
      *
      * @return              A message specifying how the invoking thread has
      *                      been released from the condition variable.
-     * @retval RDY_OK       if the condvar has been signaled using
+     * @retval MSG_OK       if the condvar has been signaled using
      *                      @p chCondSignal().
-     * @retval RDY_RESET    if the condvar has been signaled using
+     * @retval MSG_RESET    if the condvar has been signaled using
      *                      @p chCondBroadcast().
      *
      * @sclass
@@ -1341,11 +1457,11 @@ namespace chibios_rt {
      *
      * @param[in] time          the number of ticks before the operation fails
      * @return                  The wakep mode.
-     * @retval RDY_OK if        the condvar was signaled using
+     * @retval MSG_OK if        the condvar was signaled using
      *                          @p chCondSignal().
-     * @retval RDY_RESET        if the condvar was signaled using
+     * @retval MSG_RESET        if the condvar was signaled using
      *                          @p chCondBroadcast().
-     * @retval RDY_TIMEOUT      if the condvar was not signaled within the
+     * @retval MSG_TIMEOUT      if the condvar was not signaled within the
      *                          specified timeout.
      *
      * @api
@@ -1474,372 +1590,6 @@ namespace chibios_rt {
   };
 #endif /* CH_CFG_USE_EVENTS */
 
-#if CH_CFG_USE_QUEUES || defined(__DOXYGEN__)
-  /*------------------------------------------------------------------------*
-   * chibios_rt::InQueue                                                    *
-   *------------------------------------------------------------------------*/
-  /**
-   * @brief   Class encapsulating an input queue.
-   */
-  class InQueue {
-  private:
-    /**
-     * @brief   Embedded @p ::InputQueue structure.
-     */
-    ::input_queue_t iq;
-
-  public:
-    /**
-     * @brief   InQueue constructor.
-     *
-     * @param[in] bp        pointer to a memory area allocated as queue buffer
-     * @param[in] size      size of the queue buffer
-     * @param[in] infy      pointer to a callback function that is invoked when
-     *                      data is read from the queue. The value can be
-     *                      @p NULL.
-     * @param[in] link      application defined pointer
-     *
-     * @init
-     */
-    InQueue(uint8_t *bp, size_t size, qnotify_t infy, void *link);
-
-    /**
-     * @brief   Returns the filled space into an input queue.
-     *
-     * @return              The number of full bytes in the queue.
-     * @retval 0            if the queue is empty.
-     *
-     * @iclass
-     */
-    size_t getFullI(void);
-
-    /**
-     * @brief   Returns the empty space into an input queue.
-     *
-     * @return              The number of empty bytes in the queue.
-     * @retval 0            if the queue is full.
-     *
-     * @iclass
-     */
-    size_t getEmptyI(void);
-
-    /**
-     * @brief   Evaluates to @p TRUE if the specified input queue is empty.
-     *
-     * @return              The queue status.
-     * @retval false        if the queue is not empty.
-     * @retval true         if the queue is empty.
-     *
-     * @iclass
-     */
-    bool isEmptyI(void);
-
-    /**
-     * @brief   Evaluates to @p TRUE if the specified input queue is full.
-     *
-     * @return              The queue status.
-     * @retval FALSE        if the queue is not full.
-     * @retval TRUE         if the queue is full.
-     *
-     * @iclass
-     */
-    bool isFullI(void);
-
-    /**
-     * @brief   Resets an input queue.
-     * @details All the data in the input queue is erased and lost, any waiting
-     *          thread is resumed with status @p Q_RESET.
-     * @note    A reset operation can be used by a low level driver in order to
-     *          obtain immediate attention from the high level layers.
-     * @iclass
-     */
-    void resetI(void);
-
-    /**
-     * @brief   Input queue write.
-     * @details A byte value is written into the low end of an input queue.
-     *
-     * @param[in] b         the byte value to be written in the queue
-     * @return              The operation status.
-     * @retval Q_OK         if the operation has been completed with success.
-     * @retval Q_FULL       if the queue is full and the operation cannot be
-     *                      completed.
-     *
-     * @iclass
-     */
-    msg_t putI(uint8_t b);
-
-    /**
-     * @brief   Input queue read.
-     * @details This function reads a byte value from an input queue. If the
-     *          queue is empty then the calling thread is suspended until a
-     *          byte arrives in the queue.
-     *
-     * @return              A byte value from the queue.
-     * @retval Q_RESET      if the queue has been reset.
-     *
-     * @api
-     */
-    msg_t get();
-
-    /**
-     * @brief   Input queue read with timeout.
-     * @details This function reads a byte value from an input queue. If the
-     *          queue is empty then the calling thread is suspended until a
-     *          byte arrives in the queue or a timeout occurs.
-     * @note    The callback is invoked before reading the character from the
-     *          buffer or before entering the state @p THD_STATE_WTQUEUE.
-     *
-     * @param[in] time      the number of ticks before the operation timeouts,
-     *                      the following special values are allowed:
-     *                      - @a TIME_IMMEDIATE immediate timeout.
-     *                      - @a TIME_INFINITE no timeout.
-     *                      .
-     * @return              A byte value from the queue.
-     * @retval Q_TIMEOUT    if the specified time expired.
-     * @retval Q_RESET      if the queue has been reset.
-     *
-     * @api
-     */
-    msg_t get(systime_t time);
-
-    /**
-     * @brief   Input queue read with timeout.
-     * @details The function reads data from an input queue into a buffer. The
-     *          operation completes when the specified amount of data has been
-     *          transferred or after the specified timeout or if the queue has
-     *          been reset.
-     * @note    The function is not atomic, if you need atomicity it is
-     *          suggested to use a semaphore or a mutex for mutual exclusion.
-     * @note    The callback is invoked before reading each character from the
-     *          buffer or before entering the state @p THD_STATE_WTQUEUE.
-     *
-     * @param[out] bp       pointer to the data buffer
-     * @param[in] n         the maximum amount of data to be transferred, the
-     *                      value 0 is reserved
-     * @param[in] time      the number of ticks before the operation timeouts,
-     *                      the following special values are allowed:
-     *                      - @a TIME_IMMEDIATE immediate timeout.
-     *                      - @a TIME_INFINITE no timeout.
-     *                      .
-     * @return              The number of bytes effectively transferred.
-     *
-     * @api
-     */
-    size_t read(uint8_t *bp, size_t n, systime_t time);
-  };
-
-  /*------------------------------------------------------------------------*
-   * chibios_rt::InQueueBuffer                                              *
-   *------------------------------------------------------------------------*/
-  /**
-   * @brief   Template class encapsulating an input queue and its buffer.
-   *
-   * @param N                   size of the input queue
-   */
-  template <int N>
-  class InQueueBuffer : public InQueue {
-  private:
-    uint8_t iq_buf[N];
-
-  public:
-    /**
-     * @brief   InQueueBuffer constructor.
-     *
-     * @param[in] infy      input notify callback function
-     * @param[in] link      parameter to be passed to the callback
-     *
-     * @init
-     */
-    InQueueBuffer(qnotify_t infy, void *link) : InQueue(iq_buf, N,
-                                                        infy, link) {
-    }
-  };
-
-  /*------------------------------------------------------------------------*
-   * chibios_rt::OutQueue                                                   *
-   *------------------------------------------------------------------------*/
-  /**
-   * @brief   Class encapsulating an output queue.
-   */
-  class OutQueue {
-  private:
-    /**
-     * @brief   Embedded @p ::OutputQueue structure.
-     */
-    ::output_queue_t oq;
-
-  public:
-    /**
-     * @brief   OutQueue constructor.
-     *
-     * @param[in] bp        pointer to a memory area allocated as queue buffer
-     * @param[in] size      size of the queue buffer
-     * @param[in] onfy      pointer to a callback function that is invoked when
-     *                      data is written to the queue. The value can be
-     *                      @p NULL.
-     * @param[in] link      application defined pointer
-     *
-     * @init
-     */
-    OutQueue(uint8_t *bp, size_t size, qnotify_t onfy, void *link);
-
-    /**
-     * @brief   Returns the filled space into an output queue.
-     *
-     * @return              The number of full bytes in the queue.
-     * @retval 0            if the queue is empty.
-     *
-     * @iclass
-     */
-    size_t getFullI(void);
-
-    /**
-     * @brief   Returns the empty space into an output queue.
-     *
-     * @return              The number of empty bytes in the queue.
-     * @retval 0            if the queue is full.
-     *
-     * @iclass
-     */
-    size_t getEmptyI(void);
-
-    /**
-     * @brief   Evaluates to @p TRUE if the specified output queue is empty.
-     *
-     * @return              The queue status.
-     * @retval false        if the queue is not empty.
-     * @retval true         if the queue is empty.
-     *
-     * @iclass
-     */
-    bool isEmptyI(void);
-
-    /**
-     * @brief   Evaluates to @p TRUE if the specified output queue is full.
-     *
-     * @return              The queue status.
-     * @retval FALSE        if the queue is not full.
-     * @retval TRUE         if the queue is full.
-     *
-     * @iclass
-     */
-    bool isFullI(void);
-
-    /**
-     * @brief   Resets an output queue.
-     * @details All the data in the output queue is erased and lost, any
-     *          waiting thread is resumed with status @p Q_RESET.
-     * @note    A reset operation can be used by a low level driver in order
-     *          to obtain immediate attention from the high level layers.
-     *
-     * @iclass
-     */
-    void resetI(void);
-
-    /**
-     * @brief   Output queue write.
-     * @details This function writes a byte value to an output queue. If the
-     *          queue is full then the calling thread is suspended until there
-     *          is space in the queue.
-     *
-     * @param[in] b         the byte value to be written in the queue
-     * @return              The operation status.
-     * @retval Q_OK         if the operation succeeded.
-     * @retval Q_RESET      if the queue has been reset.
-     *
-     * @api
-     */
-    msg_t put(uint8_t b);
-
-    /**
-     * @brief   Output queue write with timeout.
-     * @details This function writes a byte value to an output queue. If the
-     *          queue is full then the calling thread is suspended until there
-     *          is space in the queue or a timeout occurs.
-     * @note    The callback is invoked after writing the character into the
-     *          buffer.
-     *
-     * @param[in] b         the byte value to be written in the queue
-     * @param[in] time      the number of ticks before the operation timeouts,
-     *                      the following special values are allowed:
-     *                      - @a TIME_IMMEDIATE immediate timeout.
-     *                      - @a TIME_INFINITE no timeout.
-     *                      .
-     * @return              The operation status.
-     * @retval Q_OK         if the operation succeeded.
-     * @retval Q_TIMEOUT    if the specified time expired.
-     * @retval Q_RESET      if the queue has been reset.
-     *
-     * @api
-     */
-    msg_t put(uint8_t b, systime_t time);
-
-    /**
-     * @brief   Output queue read.
-     * @details A byte value is read from the low end of an output queue.
-     *
-     * @return              The byte value from the queue.
-     * @retval Q_EMPTY      if the queue is empty.
-     *
-     * @iclass
-     */
-    msg_t getI(void);
-
-    /**
-     * @brief   Output queue write with timeout.
-     * @details The function writes data from a buffer to an output queue. The
-     *          operation completes when the specified amount of data has been
-     *          transferred or after the specified timeout or if the queue has
-     *          been reset.
-     * @note    The function is not atomic, if you need atomicity it is
-     *          suggested to use a semaphore or a mutex for mutual exclusion.
-     * @note    The callback is invoked after writing each character into the
-     *          buffer.
-     *
-     * @param[out] bp       pointer to the data buffer
-     * @param[in] n         the maximum amount of data to be transferred, the
-     *                      value 0 is reserved
-     * @param[in] time      the number of ticks before the operation timeouts,
-     *                      the following special values are allowed:
-     *                      - @a TIME_IMMEDIATE immediate timeout.
-     *                      - @a TIME_INFINITE no timeout.
-     *                      .
-     * @return              The number of bytes effectively transferred.
-     *
-     * @api
-     */
-    size_t write(const uint8_t *bp, size_t n, systime_t time);
-};
-
-  /*------------------------------------------------------------------------*
-   * chibios_rt::OutQueueBuffer                                             *
-   *------------------------------------------------------------------------*/
-  /**
-   * @brief   Template class encapsulating an output queue and its buffer.
-   *
-   * @param N                   size of the output queue
-   */
-  template <int N>
-  class OutQueueBuffer : public OutQueue {
-  private:
-    uint8_t oq_buf[N];
-
-  public:
-    /**
-     * @brief   OutQueueBuffer constructor.
-     *
-     * @param[in] onfy      output notify callback function
-     * @param[in] link      parameter to be passed to the callback
-     *
-     * @init
-     */
-    OutQueueBuffer(qnotify_t onfy, void *link) : OutQueue(oq_buf, N,
-                                                          onfy, link) {
-    }
-  };
-#endif /* CH_CFG_USE_QUEUES */
-
 #if CH_CFG_USE_MAILBOXES || defined(__DOXYGEN__)
   /*------------------------------------------------------------------------*
    * chibios_rt::Mailbox                                                    *
@@ -1875,7 +1625,7 @@ namespace chibios_rt {
 
     /**
      * @brief   Resets a Mailbox object.
-     * @details All the waiting threads are resumed with status @p RDY_RESET
+     * @details All the waiting threads are resumed with status @p MSG_RESET
      *          and the queued messages are lost.
      *
      * @api
