@@ -4,7 +4,7 @@
 #
 
 # En/disable usage of maplemini bootloader support
-USE_MAPLEMINI_BOOTLOADER ?= 1
+USE_MAPLEMINI_BOOTLOADER ?= 0
 
 # Compiler options here.
 ifeq ($(USE_OPT),)
@@ -115,7 +115,7 @@ include $(APP)/src.mk
 ifeq ($(USE_MAPLEMINI_BOOTLOADER),1)
   LDSCRIPT = $(STARTUPLD)/STM32F103xB_maplemini_bootloader.ld
 else
-  LDSCRIPT = $(STARTUPLD)/STM32F103xB.ld
+  LDSCRIPT = $(STARTUPLD)/STM32F103x8.ld
 endif
 
 # C sources that can be compiled in ARM or THUMB mode depending on the global
