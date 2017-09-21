@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@
  * Board identifier.
  */
 #define BOARD_MAPLEMINI_STM32_F103
-#define BOARD_NAME              "STM32F103 eval"
+#define BOARD_NAME              "LeafLabs Maple Mini"
 
 /*
  * Board frequencies.
@@ -36,7 +36,7 @@
 /*
  * MCU type, supported types are defined in ./os/hal/platforms/hal_lld.h.
  */
-#define STM32F10X_MD
+#define STM32F103xB
 
 /*
  * IO pins assignments
