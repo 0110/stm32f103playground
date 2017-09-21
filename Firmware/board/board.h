@@ -46,6 +46,7 @@
  */
 
 /* on-board */
+
 #define GPIOB_USB_DISC          9
 #define GPIOD_OSC_IN            0
 #define GPIOD_OSC_OUT           1

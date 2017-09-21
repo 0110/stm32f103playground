@@ -26,6 +26,9 @@
 
 #include "usbcfg.h"
 
+#define PRINT_SD	SD2
+#define PRINT( ... ) chprintf((BaseSequentialStream *) &PRINT_SD, __VA_ARGS__);/**< Uart print */
+
 /*===========================================================================*/
 /* Command line related.                                                     */
 /*===========================================================================*/
@@ -135,6 +138,12 @@ int __attribute__((noreturn)) main(void) {
   usbConnectBus(serusbcfg.usbp);
 
   /*
+   * Activates the serial driver 6 and SDC driver 1 using default
+   * configuration.
+   */
+  sdStart(&PRINT_SD, NULL);
+
+  /*
    * Shell manager initialization.
    */
   shellInit();
@@ -142,7 +151,10 @@ int __attribute__((noreturn)) main(void) {
   /*
    * Creates the blinker thread.
    */
+  palSetPadMode(GPIOB, GPIOB_LED, PAL_MODE_OUTPUT_PUSHPULL);
   chThdCreateStatic(waThread1, sizeof(waThread1), NORMALPRIO, Thread1, NULL);
+
+  PRINT("\x1b[1J\x1b[0;0HStarting ChibiOS\r\n");
 
   /*
    * Normal main() thread activity, spawning shells.
