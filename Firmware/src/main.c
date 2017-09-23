@@ -24,64 +24,22 @@
 #include "shell.h"
 #include "chprintf.h"
 
-#include "usbcfg.h"
+#define PRINT_UART1	SD1
+#define PRINT( ... ) chprintf((BaseSequentialStream *) &PRINT_UART1, __VA_ARGS__);/**< Uart print */
 
-#define PRINT_SD	SD2
-#define PRINT( ... ) chprintf((BaseSequentialStream *) &PRINT_SD, __VA_ARGS__);/**< Uart print */
+#define SHELL_WA_SIZE   THD_WORKING_AREA_SIZE(2048)
+
 
 /*===========================================================================*/
 /* Command line related.                                                     */
 /*===========================================================================*/
 
-#define SHELL_WA_SIZE   THD_WORKING_AREA_SIZE(2048)
-
-/* Can be measured using dd if=/dev/xxxx of=/dev/null bs=512 count=10000.*/
-static void cmd_write(BaseSequentialStream *chp, int argc, char *argv[]) {
-  static uint8_t buf[] =
-      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
-      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
-      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
-      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
-      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
-      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
-      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
-      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
-      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
-      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
-      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
-      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
-      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
-      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
-      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
-      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
-
-  (void)argv;
-  if (argc > 0) {
-    chprintf(chp, "Usage: write\r\n");
-    return;
-  }
-
-  while (chnGetTimeout((BaseChannel *)chp, TIME_IMMEDIATE) == Q_TIMEOUT) {
-#if 1
-    /* Writing in channel mode.*/
-    chnWrite(&SDU1, buf, sizeof buf - 1);
-#else
-    /* Writing in buffer mode.*/
-    (void) obqGetEmptyBufferTimeout(&SDU1.obqueue, TIME_INFINITE);
-    memcpy(SDU1.obqueue.ptr, buf, SERIAL_USB_BUFFERS_SIZE);
-    obqPostFullBuffer(&SDU1.obqueue, SERIAL_USB_BUFFERS_SIZE);
-#endif
-  }
-  chprintf(chp, "\r\n\nstopped\r\n");
-}
-
 static const ShellCommand commands[] = {
-  {"write", cmd_write},
   {NULL, NULL}
 };
 
 static const ShellConfig shell_cfg1 = {
-  (BaseSequentialStream *)&SDU1,
+  (BaseSequentialStream *)&PRINT_UART1,
   commands
 };
 
@@ -98,13 +56,19 @@ static __attribute__((noreturn)) THD_FUNCTION(Thread1, arg) {
   (void)arg;
   chRegSetThreadName("blinker");
   while (true) {
-    systime_t time = serusbcfg.usbp->state == USB_ACTIVE ? 250 : 500;
+    systime_t time = 250;
     palClearPad(GPIOB, GPIOB_LED);
     chThdSleepMilliseconds(time);
     palSetPad(GPIOB, GPIOB_LED);
     chThdSleepMilliseconds(time);
   }
 }
+
+static const GPTConfig gpt4cfg = {
+  1000000, // 1 MHz timer clock.
+  NULL, // No callback
+  0, 0
+};
 
 /*
  * Application entry point.
@@ -122,26 +86,10 @@ int __attribute__((noreturn)) main(void) {
   chSysInit();
 
   /*
-   * Initializes a serial-over-USB CDC driver.
-   */
-  sduObjectInit(&SDU1);
-  sduStart(&SDU1, &serusbcfg);
-
-  /*
-   * Activates the USB driver and then the USB bus pull-up on D+.
-   * Note, a delay is inserted in order to not have to disconnect the cable
-   * after a reset.
-   */
-  usbDisconnectBus(serusbcfg.usbp);
-  chThdSleepMilliseconds(1500);
-  usbStart(serusbcfg.usbp, &usbcfg);
-  usbConnectBus(serusbcfg.usbp);
-
-  /*
    * Activates the serial driver 6 and SDC driver 1 using default
    * configuration.
    */
-  sdStart(&PRINT_SD, NULL);
+  sdStart(&PRINT_UART1, NULL);
 
   /*
    * Shell manager initialization.
@@ -154,18 +102,29 @@ int __attribute__((noreturn)) main(void) {
   palSetPadMode(GPIOB, GPIOB_LED, PAL_MODE_OUTPUT_PUSHPULL);
   chThdCreateStatic(waThread1, sizeof(waThread1), NORMALPRIO, Thread1, NULL);
 
-  PRINT("\x1b[1J\x1b[0;0HStarting ChibiOS\r\n");
+  /* Prepare debugging for DS18B20 */
+  palSetPadMode(GPIOA, 5, PAL_MODE_OUTPUT_PUSHPULL);
+  palWritePad(GPIOA, 5, 1);
 
+  PRINT("\x1b[1J\x1b[0;0HStarting ChibiOS\r\n");
+  PRINT("Built at " __DATE__ " and exactly " __TIME__ "\r\n");
+
+  thread_t *shelltp = chThdCreateFromHeap(NULL, SHELL_WA_SIZE,
+                                              "shell", NORMALPRIO + 1,
+                                              shellThread, (void *)&shell_cfg1);
+                                              
+  /* Waiting termination.             */
+  /*FIXME chThdWait(shelltp); */
   /*
    * Normal main() thread activity, spawning shells.
    */
   while (true) {
-    if (SDU1.config->usbp->state == USB_ACTIVE) {
-      thread_t *shelltp = chThdCreateFromHeap(NULL, SHELL_WA_SIZE,
-                                              "shell", NORMALPRIO + 1,
-                                              shellThread, (void *)&shell_cfg1);
-      chThdWait(shelltp);               /* Waiting termination.             */
-    }
-    chThdSleepMilliseconds(1000);
+    /* Debugging the RTC Timer stuff */
+    palWritePad(GPIOA, 5, PAL_LOW);
+    gptStart(&GPTD4, &gpt4cfg);
+    gptPolledDelay(&GPTD4, 78);
+    palWritePad(GPIOA, 5, PAL_HIGH);
+    gptStart(&GPTD4, &gpt4cfg);
+    gptPolledDelay(&GPTD4, 78);
   }
 }
